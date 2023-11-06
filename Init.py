@@ -9,7 +9,8 @@
    "source": [
     "FreeCAD.addImportType(\"My own format (*.own)\", \"importOwn\")\n",
     "FreeCAD.addExportType(\"My own format (*.own)\", \"importOwn\")\n",
-    "print(\"I am executing some stuff here when FreeCAD starts!\")"
+    "print(\"I am executing some stuff here when FreeCAD starts!\")\n",
+    "\n"
    ]
   }
  ],

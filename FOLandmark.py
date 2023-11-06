@@ -1,39 +1,34 @@
-{
- "cells": [
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "8a4601e5-0f23-4299-a2f8-23976bec7045",
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "import FreeCAD, FreeCADGui\n",
-    "\n",
-    "class FOLandmark:\n",
-    "    def Activated(self):\n",
-    "        FreeCAD.Console.PrintMessage(\"\")"
-   ]
-  }
- ],
- "metadata": {
-  "kernelspec": {
-   "display_name": "Python 3 (ipykernel)",
-   "language": "python",
-   "name": "python3"
-  },
-  "language_info": {
-   "codemirror_mode": {
-    "name": "ipython",
-    "version": 3
-   },
-   "file_extension": ".py",
-   "mimetype": "text/x-python",
-   "name": "python",
-   "nbconvert_exporter": "python",
-   "pygments_lexer": "ipython3",
-   "version": "3.11.5"
-  }
- },
- "nbformat": 4,
- "nbformat_minor": 5
-}
+# Title:OTHOTIC DESIGN
+# Part:1
+# Description: LANDMARKS
+# Version 0.0
+# Author: Hana Keller
+
+#===================================
+
+# Import Modules
+import FreeCAD as fc
+import FreeCADGui
+import math
+import json
+
+class FOLandmark:
+    def GetResources(self):
+        return { 
+                 "MenuText" : "Landmarks",
+                 "ToolTip"  : "Located Landmarks on Foot"}
+    
+    def Activated(self):
+        print("Select first position")
+        #while (FreeCADGui.Selection.isSelected(): 
+        #    pass
+        # print("True")
+        #selec = FreeCADGui.Selection.getSelection()
+        return
+    
+    
+    #filepath = os.path.expanduser("~/Documents/potato.json")
+    #with open(filepath, "w+") as write_file:
+        #json.dump()
+     
+FreeCADGui.addCommand("Landmark", FOLandmark())
