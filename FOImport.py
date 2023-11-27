@@ -13,6 +13,7 @@ import FreeCAD, FreeCADGui
 import json
 import os
 import Mesh
+import Part
 
 class FOImport:
 
@@ -84,15 +85,20 @@ def Main():
                     "shoe_size" : shoe_size.get_value()})).grid(row = 6, column = 0, padx = 0, pady = 0, sticky = W+E+N+S)
                     
     root.mainloop()
-    print("Move on to next Step: Landmarks")
+    print("Move on to next Step: Position")
     return
 
 def start_button(root, option_dict):
-    filepath = os.path.expanduser("~/Documents/potato.json")
+    filepath = os.path.expanduser("~/Documents/importVariables.json")
     with open(filepath, "w+") as write_file:
         json.dump(option_dict, write_file)
     root.destroy()
-    Mesh.open(option_dict['foot_file'])
+    doc = FreeCAD.newDocument()
+    foot = Mesh.Mesh(option_dict['foot_file'])
+    #foot.Label("Foot Mesh")
+    Mesh.show(foot)
+    
+    doc.recompute()
     FreeCADGui.SendMsgToActiveView("ViewFit")
     FreeCADGui.runCommand('Std_DrawStyle',2)   
 
