@@ -2,6 +2,12 @@ import FreeCAD, FreeCADGui
 import math
 
 class FOBuild:
+    def GetResources(self):
+    return { 
+                 "MenuText" : "Build",
+                 "ToolTip"  : "Build FO"}
+   
+
     def Activated(self):
         FreeCAD.Console.PrintMessage("")
 
