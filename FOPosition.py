@@ -118,7 +118,6 @@ class FOPosition:
         
         shoeEdge = self.doc.addObject("Part::Feature", "Shoe Edge")
         shoeEdge.Shape = self.bs_Outline.toShape()
-        shoeEdge.Placement = FreeCAD.Placement
         
         #self.mesh_foot = self.doc.getObjectsByLabel("Mesh")[0]
 
@@ -187,7 +186,7 @@ def moveMesh():
  
     ##Confirm/Fix left or right foot
     ##if arch_pt.Z < 0:
-    ##mesh_foot.Placement = FreeCAD.Placement(FreeCAD.Vector(0,0,0), FreeCAD.Rotation(FreeCAD.Vector(0,0,0),180),FreeCAD.Vector(0,0,0))
+    #mesh_foot.Placement = FreeCAD.Placement(FreeCAD.Vector(0,0,0), FreeCAD.Rotation(FreeCAD.Vector(0,0,1),180),FreeCAD.Vector(0,0,0))
     ##newx0 = heel_center_x - heel_pt_x
     
     #New placement of the foot with translation and rotation to match shoe outline
