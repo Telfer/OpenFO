@@ -113,6 +113,16 @@ class FOPosition:
                                      toe_lat, ff_lat, mtpj5_dist2, mtpj5_dist1,
                                      mtpj5, mtpj5_prox, arch_lateral, heel_lateral,
                                      heel_center_lateral, heel_center]
+                                     
+                                     
+        ##Confirm Left or Right foot:
+        if 1==1:
+            for i in range(len(points_outline)):
+                points_outline[i]=[-points_outline[i][0], points_outline[i][1], points_outline[i][2]]
+                print(points_outline[i])
+        else:
+            pass
+        
         self.bs_Outline = Part.BSplineCurve()
         self.bs_Outline.buildFromPoles(points_outline, True)
         
@@ -190,7 +200,7 @@ def moveMesh():
     ##newx0 = heel_center_x - heel_pt_x
     
     #New placement of the foot with translation and rotation to match shoe outline
-    mesh_foot.Placement = FreeCAD.Placement(FreeCAD.Vector(-midpoint.X,midpoint.Z,-midpoint.Y), FreeCAD.Rotation(FreeCAD.Vector(rot_axis[0], rot_axis[1], rot_axis[2]),theta),FreeCAD.Vector(0,0,0))
+    mesh_foot.Placement = FreeCAD.Placement(FreeCAD.Vector(midpoint.X,midpoint.Z,midpoint.Y), FreeCAD.Rotation(FreeCAD.Vector(-rot_axis[0], -rot_axis[1], rot_axis[2]),theta),FreeCAD.Vector(0,0,0))
     
 
 class ViewObserver:
