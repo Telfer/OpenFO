@@ -74,7 +74,7 @@ def Main():
     posting = BuildDropdown(root, "Posting (+ve = medial; -ve = lateral): ", 2, [-10, 10, 0.5, 1], 'degrees')
     heel_raise = BuildDropdown(root, "Heel raise:  ", 3, [-10, 10, 0.5, 1], 'degrees')
     shoe_sex = BuildDropdown(root, "Sex: ", 4, ["Female", "Male"], '')
-    shoe_size = BuildDropdown(root, "Shoe size: ", 5, [3, 15, 0.5, 1], 'size')
+    shoe_size = BuildDropdown(root, "Shoe size: ", 5, [1,2,3,4,5,6], 'size')
    
     # Button to start the build
     run_program = Button(root, text = "START", command=lambda: start_button(root, {"foot_file" : foot_file.get_value(), 
