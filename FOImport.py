@@ -62,8 +62,8 @@ class FileButton:
 def Main(): 
     root = Tk()
     root.title("FO Import")
-    root.geometry("400x320")  # set starting size of window
-    root.maxsize(400, 320)  # width x height
+    root.geometry("600x400")  # set starting size of window
+    root.maxsize(2000, 2000)  # width x height
     root.config(bg="#6FAFE7")
     
     # Get Foot STL file

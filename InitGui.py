@@ -6,7 +6,7 @@ class FOWorkbench (Workbench):
     def Initialize(self):
         import FOImport, FOLandmark, FOPosition
         
-        self.list = ["Import", "Landmark", "Position"]
+        self.list = ["Import", "Position", "Landmark"]
         self.appendToolbar("Commands", self.list)
         self.appendMenu("New Menus", self.list)
 
