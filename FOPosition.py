@@ -12,6 +12,10 @@ import Part, PartGui
 import os
 import math
 import numpy as np
+import Mesh
+import PySide.QtCore as QtCore
+from draftutils.translate import translate
+from PySide.QtCore import QT_TRANSLATE_NOOP
 
 
 ## outline data points (M9, M9.5, W8.5, M12)
@@ -64,189 +68,30 @@ class FOPosition:
                  
     def Activated(self):
         self.doc = FreeCAD.activeDocument()
-        self.Main()
- 
-        print("Move on the next Step: Landmark")
-            
-    def Main(self):     
-        print("Identify lowest point of heel on the plantar surface")
-        currentView = FreeCADGui.activeView()
-        observer = ViewObserver(currentView)
-        clickCallback = currentView.addEventCallback("SoMouseButtonEvent",observer.logPosition)
-
-    
-def readJson():
-    filepath = os.path.expanduser("~/Documents/importVariables.json")
-    f = open(filepath, "r") 
-    parameters = json.loads(f.read())
-    # self.FO_Thickness = self.parameters['FO_thickness']
-    # self.posting = self.parameters['posting']
-    # self.heel_raise = self.parameters['heel_raise']
-    # self.sex = self.parameters['shoe_sex']
-    # self.shoe_size = self.parameters['shoe_size'] 
-    shoe_size = 1
-    return shoe_size
-
-
-def buildShoeShape(size):
-
-    doc = FreeCAD.activeDocument()
-    
-    # make shoe outline numbers into coordinates
-    heel_center = [0, heel_center_pt_y[size], 0]
-    heel_lateral = [heel_lateral_pt_x[size], heel_lateral_pt_y[size], 0]
-    heel_medial = [heel_medial_pt_x[size], heel_medial_pt_y[size], 0]
-    heel_center_medial = [heel_center_medial_x[size], heel_center_medial_y[size], 0]
-    heel_center_lateral = [heel_center_lateral_x[size], heel_center_lateral_y[size], 0]
-    arch_medial = [arch_medial_pt_x[size], arch_medial_pt_y[size], 0]
-    arch_lateral = [arch_lateral_pt_x[size], arch_lateral_pt_y[size], 0]
-    mtpj1_prox = [mtpj1_prox_x[size], mtpj1_prox_y[size], 0]
-    mtpj1 = [mtpj1_pt_x[size], mtpj1_pt_y[size], 0]
-    mtpj1_dist1 = [mtpj1_dist1_x[size], mtpj1_dist1_y[size], 0]
-    mtpj1_dist2 = [mtpj1_dist2_x[size], mtpj1_dist2_y[size], 0]
-    ff_med = [ff_med_x[size], ff_med_y[size], 0]
-    toe_med = [toe_med_x[size], toe_med_y[size], 0]
-    toe = [toe_pt_x[size], toe_pt_y[size], 0]
-    toe_lat = [toe_lat_x[size], toe_lat_y[size], 0]
-    ff_lat = [ff_lat_x[size], ff_lat_y[size], 0]
-    mtpj5 = [mtpj5_pt_x[size], mtpj5_pt_y[size], 0]
-    mtpj5_dist1 = [mtpj5_dist1_x[size], mtpj5_dist1_y[size], 0]
-    mtpj5_dist2 = [mtpj5_dist2_x[size], mtpj5_dist2_y[size], 0]
-    mtpj5_prox = [mtpj5_prox_x[size], mtpj5_prox_y[size], 0]
-    
-    points_outline = [heel_center, heel_center_medial,
-                                 heel_medial, arch_medial, mtpj1_prox, mtpj1,
-                                 mtpj1_dist1, mtpj1_dist2, ff_med, toe_med, toe,
-                                 toe_lat, ff_lat, mtpj5_dist2, mtpj5_dist1,
-                                 mtpj5, mtpj5_prox, arch_lateral, heel_lateral,
-                                 heel_center_lateral, heel_center]
-                                 
-                                 
-    ##Confirm Left or Right foot:
-    positions = ["lowest point of heel on the plantar surface",
-                          "MTH1 on the plantar surface",
-                          "MTH5 on the plantar surface",
-                          "point on arch"]
-                       
-    heel_pt = doc.getObjectsByLabel(positions[0])[0]
-    MTH1_pt = doc.getObjectsByLabel(positions[1])[0]
-    MTH5_pt = doc.getObjectsByLabel(positions[2])[0]
-    arch_pt = doc.getObjectsByLabel(positions[3])[0]
-    
-    vec1 = [heel_pt.X - MTH1_pt.X, heel_pt.Y - MTH1_pt.Y, heel_pt.Z - MTH1_pt.Z]
-    vec2 = [MTH5_pt.X - MTH1_pt.X, MTH5_pt.Y - MTH1_pt.Y, MTH5_pt.Z - MTH1_pt.Z]
-    
-    planeVec = cross(vec1, vec2)
-    k = - planeVec[0] * heel_pt.X - planeVec[1] * heel_pt.Y - planeVec[2] * heel_pt.Z
-    print(f" x: {planeVec[0]} y: {planeVec[1]} z: {planeVec[2]} k: {k}")
-    
-    expectedZ = -(arch_pt.X * planeVec[0] + arch_pt.Y * planeVec[1] + k)/planeVec[2]
-               
-    if arch_pt.Z > expectedZ:
-        print("Foot is Right")
-        for i in range(len(points_outline)):
-            points_outline[i]=[-points_outline[i][0], points_outline[i][1], points_outline[i][2]]
-            #print(points_outline[i])
-    else:
-        print("Foot is Left")
-    
-    bs_Outline = Part.BSplineCurve()
-    bs_Outline.buildFromPoles(points_outline, True)
-    
-    shoeEdge = doc.addObject("Part::Feature", "Shoe Edge")
-    shoeEdge.Shape = bs_Outline.toShape()
-    
-    #self.mesh_foot = self.doc.getObjectsByLabel("Mesh")[0]      
         
-def moveMesh():
-    buildShoeShape(readJson())
-
-    doc = FreeCAD.activeDocument()
-    mesh_foot = doc.getObjectsByLabel("Mesh")[0]
-    midpoint = doc.getObjectsByLabel("Foot Mid")[0]
-    
-    positions = ["lowest point of heel on the plantar surface",
-                          "MTH1 on the plantar surface",
-                          "MTH5 on the plantar surface",
-                          "point on arch"]
-                       
-    heel_pt = doc.getObjectsByLabel(positions[0])[0]
-    MTH1_pt = doc.getObjectsByLabel(positions[1])[0]
-    MTH5_pt = doc.getObjectsByLabel(positions[2])[0]
-    arch_pt = doc.getObjectsByLabel(positions[3])[0]
-
-    heel_pt_x = heel_pt.X - midpoint.X
-    heel_pt_y = heel_pt.Y - midpoint.Y
-    heel_pt_z = heel_pt.Z - midpoint.Z
-    
-    MTH1_pt_x = MTH1_pt.X - midpoint.X
-    MTH1_pt_y = MTH1_pt.Y - midpoint.Y
-    MTH1_pt_z = MTH1_pt.Z - midpoint.Z
-    
-    MTH5_pt_x = MTH5_pt.X - midpoint.X
-    MTH5_pt_y = MTH5_pt.Y - midpoint.Y
-    MTH5_pt_z = MTH5_pt.Z - midpoint.Z
-    
-    arch_pt_x = arch_pt.X - midpoint.X
-    arch_pt_y = arch_pt.Y - midpoint.Y
-    arch_pt_z = arch_pt.Z - midpoint.Z
-    doc.recompute()
-    
-    # Find foot plane normal
-    a = (MTH1_pt_x - heel_pt_x, 
-        MTH1_pt_y - heel_pt_y, 
-        MTH1_pt_z - heel_pt_z)
-    b = (MTH5_pt_x - heel_pt_x, 
-        MTH5_pt_y - heel_pt_y, 
-        MTH5_pt_z - heel_pt_z) 
-    foot_plane_norm = cross(a, b)
-
-    # Find rotation axis between foot plane and z axis
-    z_axis = (0, 0, 1)
-    rot_axis = cross(foot_plane_norm, z_axis)
-    print(rot_axis)
-
-    # Find rotation angle between foot plane normal and z axis
-    unit_scale = math.sqrt(foot_plane_norm[0]**2 + 
-                           foot_plane_norm[1]**2 + 
-                           foot_plane_norm[2]**2)
-    foot_plane_norm = (foot_plane_norm[0] / unit_scale,
-                       foot_plane_norm[1] / unit_scale, 
-                       foot_plane_norm[2] / unit_scale)
-    d_prod = dot(foot_plane_norm, z_axis) 
-    theta = math.degrees(math.acos(d_prod))
- 
-    ##Confirm/Fix left or right foot
-    ##if arch_pt.Z < 0:
-    #mesh_foot.Placement = FreeCAD.Placement(FreeCAD.Vector(0,0,0), FreeCAD.Rotation(FreeCAD.Vector(0,0,1),180),FreeCAD.Vector(0,0,0))
-    ##newx0 = heel_center_x - heel_pt_x
-    
-    #New placement of the foot with translation and rotation to match shoe outline
-    mesh_foot.Placement = FreeCAD.Placement(FreeCAD.Vector(midpoint.X,midpoint.Z,midpoint.Y), FreeCAD.Rotation(FreeCAD.Vector(-rot_axis[0], -rot_axis[1], rot_axis[2]),theta),FreeCAD.Vector(0,0,0))
-    
-
-def cross(v1, v2):
-    cx = [v1[1] * v2[2] - v1[2] * v2[1],
-          v1[2] * v2[0] - v1[0] * v2[2],
-          v1[0] * v2[1] - v1[1] * v2[0]]
-    return cx
-
-def dot(v1, v2):
-    dp = v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2]
-    return dp
-
-
-
-class ViewObserver:
-    def __init__(self, view):
-        self.view = view
         self.positions = {"lowest point of heel on the plantar surface": None,
                           "MTH1 on the plantar surface" : None,
                           "MTH5 on the plantar surface" : None,
                           "point on arch" : None}
+        self.positionLabels = ["lowest_point_of_heel_on_the_plantar_surface",
+                          "MTH1_on_the_plantar_surface",
+                          "MTH5_on_the_plantar_surface",
+                          "point_on_arch"
+                          ]
+        self.next_position = 0
+        self.Main()
+
+            
+    def Main(self):
+        # Select each position in self.positions
+        # Each position will be registered using the callback function self.logPosition
+        print("Identify lowest point of heel on the plantar surface")
+        self.view = FreeCADGui.activeView()
         self.active_position = "lowest point of heel on the plantar surface"
         self.doc = FreeCAD.activeDocument()
-        
+        self.clickCallback = self.view.addEventCallback("SoMouseButtonEvent",self.logPosition)
+   
+    
     def logPosition(self, info):
         down = (info["State"] == "DOWN")
         pos = info["Position"]
@@ -258,28 +103,25 @@ class ViewObserver:
                 pass
             elif list(self.positions.keys()).index(self.active_position) in range(len(list(self.positions.keys()))):
                 if self.doc.getObjectsByLabel(self.active_position) != []:
-                    point = self.doc.getObjectsByLabel(self.active_position)[0]
-                    point.X = self.positions[self.active_position]["x"]
-                    point.Y = self.positions[self.active_position]["y"]
-                    point.Z = self.positions[self.active_position]["z"]
+                    self.point = self.doc.getObjectsByLabel(self.positionLabels[0])
+                    self.point.X = self.positions[self.active_position]["x"]
+                    self.point.Y = self.positions[self.active_position]["y"]
+                    self.point.Z = self.positions[self.active_position]["z"]
                 else:
-                    print(self.active_position)
-                    point = self.doc.addObject("Part::Vertex", self.active_position)
-                    point.X = self.positions[self.active_position]["x"]
-                    point.Y = self.positions[self.active_position]["y"]
-                    point.Z = self.positions[self.active_position]["z"]
-                    point.Label = self.active_position
-                
+                    self.point = self.doc.addObject("Part::Vertex", self.active_position)
+                    self.point.Label = self.active_position
+                    self.point.X = self.positions[self.active_position]["x"]
+                    self.point.Y = self.positions[self.active_position]["y"]
+                    self.point.Z = self.positions[self.active_position]["z"]
+                                    
                 self.doc.recompute()
                 
-                try:
-                    self.active_position = list(self.positions.keys())[list(self.positions.keys()).index(self.active_position) + 1]
+                # Iterate over all positions in the self.positions dictionary
+                self.next_position = list(self.positions.keys()).index(self.active_position) + 1
+                if self.next_position <= len(self.positions.keys()) - 1:
+                    self.active_position = list(self.positions.keys())[self.next_position]
                     FreeCAD.Console.PrintMessage(f"Identify {self.active_position} \n")
-                except:
-                    #filepath = os.path.expanduser("~/Documents/landmarkVariables.json")
-                    #with open(filepath, "w+") as write_file:
-                        #json.dump(self.positions, write_file)
-                    
+                else:                    
                     # Determine forefoot centre point
                     MTH1_pt_X = self.positions["MTH1 on the plantar surface"]["x"]
                     MTH5_pt_X = self.positions["MTH5 on the plantar surface"]["x"]
@@ -298,17 +140,197 @@ class ViewObserver:
                     heel_pt_Z = self.positions["lowest point of heel on the plantar surface"]["z"]
                     
                     foot_mid = [(ff_mid[0] + heel_pt_X) / 2,(ff_mid[1] + heel_pt_Y) / 2, (ff_mid[2] + heel_pt_Z) / 2]
-                    point_foot_mid = self.doc.addObject("Part::Vertex", "Foot Mid")
-                    point_foot_mid.Label = "Foot Mid"
-                    point_foot_mid.X = foot_mid[0]
-                    point_foot_mid.Y = foot_mid[1]
-                    point_foot_mid.Z = foot_mid[2]
+                    self.midpoint = self.doc.addObject("Part::Vertex", "Foot Mid")
+                    self.midpoint.Label = "Foot Mid"
+                    self.midpoint.X = foot_mid[0]
+                    self.midpoint.Y = foot_mid[1]
+                    self.midpoint.Z = foot_mid[2]
                     self.doc.recompute()
-                    moveMesh()
+                    self.moveMesh()
+                    self.active_position = None
+                    self.point = self.doc.getObjectsByLabel("Mesh001")
+                    self.midpoint = self.doc.getObjectsByLabel("Mesh001")
+                    self.heel_pt = 0
+                    self.MTH1_pt = 0
+                    self.MTH5_pt = 0
+                    self.arch_pt = 0
+                    self.finish()
             else:
-                pass
-                
-                
-       
+                pass   
+    
+    def readJson(self):
+        filepath = os.path.expanduser("~/Documents/importVariables.json")
+        f = open(filepath, "r") 
+        parameters = json.loads(f.read())
+        shoe_size = parameters['shoe_size'] 
+        shoe_size = 1
+        return shoe_size
+
+
+    def buildShoeShape(self, size):        
+        # make shoe outline numbers into coordinates
+        heel_center = [0, heel_center_pt_y[size], 0]
+        heel_lateral = [heel_lateral_pt_x[size], heel_lateral_pt_y[size], 0]
+        heel_medial = [heel_medial_pt_x[size], heel_medial_pt_y[size], 0]
+        heel_center_medial = [heel_center_medial_x[size], heel_center_medial_y[size], 0]
+        heel_center_lateral = [heel_center_lateral_x[size], heel_center_lateral_y[size], 0]
+        arch_medial = [arch_medial_pt_x[size], arch_medial_pt_y[size], 0]
+        arch_lateral = [arch_lateral_pt_x[size], arch_lateral_pt_y[size], 0]
+        mtpj1_prox = [mtpj1_prox_x[size], mtpj1_prox_y[size], 0]
+        mtpj1 = [mtpj1_pt_x[size], mtpj1_pt_y[size], 0]
+        mtpj1_dist1 = [mtpj1_dist1_x[size], mtpj1_dist1_y[size], 0]
+        mtpj1_dist2 = [mtpj1_dist2_x[size], mtpj1_dist2_y[size], 0]
+        ff_med = [ff_med_x[size], ff_med_y[size], 0]
+        toe_med = [toe_med_x[size], toe_med_y[size], 0]
+        toe = [toe_pt_x[size], toe_pt_y[size], 0]
+        toe_lat = [toe_lat_x[size], toe_lat_y[size], 0]
+        ff_lat = [ff_lat_x[size], ff_lat_y[size], 0]
+        mtpj5 = [mtpj5_pt_x[size], mtpj5_pt_y[size], 0]
+        mtpj5_dist1 = [mtpj5_dist1_x[size], mtpj5_dist1_y[size], 0]
+        mtpj5_dist2 = [mtpj5_dist2_x[size], mtpj5_dist2_y[size], 0]
+        mtpj5_prox = [mtpj5_prox_x[size], mtpj5_prox_y[size], 0]
+        
+        points_outline = [heel_center, heel_center_medial,
+                                     heel_medial, arch_medial, mtpj1_prox, mtpj1,
+                                     mtpj1_dist1, mtpj1_dist2, ff_med, toe_med, toe,
+                                     toe_lat, ff_lat, mtpj5_dist2, mtpj5_dist1,
+                                     mtpj5, mtpj5_prox, arch_lateral, heel_lateral,
+                                     heel_center_lateral, heel_center]
+                                     
+                                     
+        ##Confirm Left or Right foot:                           
+        self.heel_pt = self.doc.getObjectsByLabel("lowest point of heel on the plantar surface")[0]
+        self.MTH1_pt = self.doc.getObjectsByLabel("MTH1 on the plantar surface")[0]
+        self.MTH5_pt = self.doc.getObjectsByLabel("MTH5 on the plantar surface")[0]
+        self.arch_pt = self.doc.getObjectsByLabel("point on arch")[0]
+
+        vec1 = [self.heel_pt.X - self.MTH1_pt.X, self.heel_pt.Y - self.MTH1_pt.Y, self.heel_pt.Z - self.MTH1_pt.Z]
+        vec2 = [self.MTH5_pt.X - self.MTH1_pt.X, self.MTH5_pt.Y - self.MTH1_pt.Y, self.MTH5_pt.Z - self.MTH1_pt.Z]
+        
+        planeVec = cross(vec1, vec2)
+        k = - planeVec[0] * self.heel_pt.X - planeVec[1] * self.heel_pt.Y - planeVec[2] * self.heel_pt.Z
+        
+        expectedZ = -(self.arch_pt.X * planeVec[0] + self.arch_pt.Y * planeVec[1] + k)/planeVec[2]
+                   
+        if self.arch_pt.Z < expectedZ:
+            for i in range(len(points_outline)):
+                points_outline[i]=[-points_outline[i][0], points_outline[i][1], points_outline[i][2]]
+        else:
+            pass
+        self.bs_Outline = Part.BSplineCurve()
+        self.bs_Outline.buildFromPoles(points_outline, True)
+        
+        self.shoeEdge = self.doc.addObject("Part::Feature", "Shoe Edge")
+        self.shoeEdge.Shape = self.bs_Outline.toShape()
+
+            
+    def moveMesh(self):
+        self.buildShoeShape(self.readJson())
+        mesh_foot = self.doc.getObjectsByLabel("Mesh")[0]
+        #self.midpoint = self.doc.getObjectsByLabel("Foot Mid")[0]
+
+        heel_pt_x = self.heel_pt.X - self.midpoint.X
+        heel_pt_y = self.heel_pt.Y - self.midpoint.Y
+        heel_pt_z = self.heel_pt.Z - self.midpoint.Z
+        
+        MTH1_pt_x = self.MTH1_pt.X - self.midpoint.X
+        MTH1_pt_y = self.MTH1_pt.Y - self.midpoint.Y
+        MTH1_pt_z = self.MTH1_pt.Z - self.midpoint.Z
+        
+        MTH5_pt_x = self.MTH5_pt.X - self.midpoint.X
+        MTH5_pt_y = self.MTH5_pt.Y - self.midpoint.Y
+        MTH5_pt_z = self.MTH5_pt.Z - self.midpoint.Z
+        
+        arch_pt_x = self.arch_pt.X - self.midpoint.X
+        arch_pt_y = self.arch_pt.Y - self.midpoint.Y
+        arch_pt_z = self.arch_pt.Z - self.midpoint.Z
+        self.doc.recompute()
+        
+        # Find foot plane normal
+        a = (MTH1_pt_x - heel_pt_x, 
+            MTH1_pt_y - heel_pt_y, 
+            MTH1_pt_z - heel_pt_z)
+        b = (MTH5_pt_x - heel_pt_x, 
+            MTH5_pt_y - heel_pt_y, 
+            MTH5_pt_z - heel_pt_z) 
+        foot_plane_norm = cross(a, b)
+
+        # Find rotation axis between foot plane and z axis
+        z_axis = (0, 0, 1)
+        rot_axis = cross(foot_plane_norm, z_axis)
+
+        # Find rotation angle between foot plane normal and z axis
+        unit_scale = math.sqrt(foot_plane_norm[0]**2 + 
+                               foot_plane_norm[1]**2 + 
+                               foot_plane_norm[2]**2)
+        foot_plane_norm = (foot_plane_norm[0] / unit_scale,
+                           foot_plane_norm[1] / unit_scale, 
+                           foot_plane_norm[2] / unit_scale)
+        d_prod = dot(foot_plane_norm, z_axis) 
+        theta = math.degrees(math.acos(d_prod))
+     
+        
+        #New placement of the foot with translation and rotation to match shoe outline
+        mesh_foot.Placement = FreeCAD.Placement(FreeCAD.Vector(self.midpoint.X,self.midpoint.Z,self.midpoint.Y), FreeCAD.Rotation(FreeCAD.Vector(-rot_axis[0], -rot_axis[1], rot_axis[2]),theta),FreeCAD.Vector(0,0,0))
+        mesh_final = mesh_foot.Mesh.copy()
+        Mesh.show(mesh_final)
+        self.doc.recompute()
+        
+    def remove_objects(self):
+        FreeCADGui.Selection.clearSelection()
+        for obj in self.doc.Objects:
+            print(f"Object: {obj} Label: {obj.Label} Type: obj.Type")
+            if obj.Label not in ["Shoe_Edge", "Mesh001", "point on arch", "Foot Mid"]:
+                try:
+                    print(f"Removing {obj.Label}")
+                    self.doc.removeObject(obj.Label.replace(' ', '_'))
+                    
+                except Exception as e:
+                    print(f"Could not remove {obj.Label.replace(' ', '_')} exception {e}")
+            
+        mesh_foot = self.doc.getObjectsByLabel("Mesh001")[0]
+        self.doc.recompute()
+
+    def finish(self):
+            """Terminate the operation."""
+            self.remove_objects()
+            if self.clickCallback:
+                try:
+                    self.view.removeEventCallback("SoMouseButtonEvent", self.clickCallback)
+                    self.clickCallback = None
+                except Exception as e:
+                    print(e)
+            print("Move on to Rotate and Move as needed")
+            FreeCADGui.Selection.clearSelection()
+
+def cross(v1, v2):
+    cx = [v1[1] * v2[2] - v1[2] * v2[1],
+          v1[2] * v2[0] - v1[0] * v2[2],
+          v1[0] * v2[1] - v1[1] * v2[0]]
+    return cx
+
+def dot(v1, v2):
+    dp = v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2]
+    return dp
+
+def toString(u):
+    if isinstance(u, list):
+        s = "["
+        first = True
+        for v in u:
+            s += "FreeCAD.Vector("
+            s += str(v.x) + ", " + str(v.y) + ", " + str(v.z)
+            s += ")"
+            if first:
+                s += ", "
+                first = True
+        s = s.rstrip(", ")
+        s += "]"
+        return s
+    else:
+        s = "FreeCAD.Vector("
+        s += str(u.x) + ", " + str(u.y) + ", " + str(u.z)
+        s += ")"
+        return s
 
 FreeCADGui.addCommand("Position", FOPosition())

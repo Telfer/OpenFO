@@ -1,5 +1,12 @@
 import FreeCAD, FreeCADGui
+import json
+import Part, PartGui
+import os
 import math
+import numpy as np
+
+# Gordoncurve / Bspline curve
+
 
 class FOBuild:
     def GetResources(self):
@@ -10,6 +17,16 @@ class FOBuild:
 
     def Activated(self):
         FreeCAD.Console.PrintMessage("")
+        
+    def readJson(self)
+        filepath = os.path.expanduser("~/Documents/importVariables.json")
+        f = open(filepath, "r") 
+        self.parameters = json.loads(f.read())
+        self.FO_Thickness = self.parameters['FO_thickness']
+        self.posting = self.parameters['posting']
+        self.heel_raise = self.parameters['heel_raise']
+        self.sex = self.parameters['shoe_sex']
+        self.shoe_size = self.parameters['shoe_size']
 
 # =============================================================================
 
@@ -38,7 +55,8 @@ class FOBuild:
         xx = [xt, yt, 0.0]
         return xx
     
-    def rot_point_coords(pt, center, angle, axis):
+    def rot_point_coords(pt, center, angle, axis):\
+    ##Update
         point = rs.AddPoint(pt)
         point_rot = rs.RotateObject(point, center, angle, axis)
         rs.UnselectAllObjects()
@@ -48,6 +66,7 @@ class FOBuild:
         return point_coords[0]
     
     def get_layer_point_coords(layer):
+    ##update
         layer_bits = rs.ObjectsByLayer(layer)
         point = layer_bits[0]
         rs.UnselectAllObjects()
@@ -162,26 +181,45 @@ class FOBuild:
         # =========================================================================
         
         # make curves
-        medial_curve = rs.AddInterpCurve([heel_center, heel_center_medial,
+        
+        self.bs_Outline = Part.BSplineCurve()
+        self.bs_Outline.buildFromPoles(points_outline, True)
+        
+        shoeEdge = self.doc.addObject("Part::Feature", "Shoe Edge")
+        shoeEdge.Shape = self.bs_Outline.toShape()
+        
+        m
+        medial_curve = Part.BSplineCurve()
+        medial_curve_points =[heel_center, heel_center_medial,
                                           heel_medial, arch_medial_adj, 
                                           mtpj1_prox2, mtpj1_prox1, mtpj1_lateral1,
                                           mtpj1_lateral2,
-                                          ff_center], degree = 3, knotstyle = 2)
-        lateral_curve = rs.AddInterpCurve([heel_center, heel_center_lateral,
+                                          ff_center]
+        medialCurve = doc.addObject("Part::Feature", "Medial Curve")                                  
+        medialCurve.Shape = medial_curve.toShape()
+        
+        lateral_curve = Part.BSplineCurve()                                  
+        lateral_curve_points = [heel_center, heel_center_lateral,
                                            heel_lateral, arch_lateral_adj, 
                                            mtpj5_prox2, mtpj5_prox1, mtpj5_lateral1,
                                            mtpj5_lateral2,
-                                           ff_center], degree = 3, knotstyle = 2)
-        center_curve = rs.AddInterpCurve([heel_center, 
+                                           ff_center]
+        lateralCurve = doc.addObject("Part::Feature", "Lateral Curve")                                  
+        lateralCurve.Shape = lateral_curve.toShape()                                   
+                                           
+        center_curve = Part.BSplineCurve()                                   
+        center_curve_points = [heel_center, 
                                           [(heel_medial[0] + heel_lateral[0]) / 2, 
                                           (heel_medial[1] + heel_lateral[1]) / 2, 0.0],
-                                          arch_mid, ff_center])
-        cross_curve_heel = rs.AddInterpCurve([heel_medial, 
+                                          arch_mid, ff_center]
+        cross_curve_heel = Part.BSplineCurve()                                  
+        cross_curve_heel_points = [heel_medial, 
                                               [(heel_medial[0] + heel_lateral[0]) / 2, 
                                                (heel_medial[1] + heel_lateral[1]) / 2, 2.0], 
-                                              heel_lateral])
-        cross_curve_arch = rs.AddInterpCurve([arch_medial_adj, arch_mid, 
-                                              arch_lateral_adj])
+                                              heel_lateral] 
+        cross_curve_arch = Part.BSplineCurve()                                      
+        cross_curve_arch_points = [arch_medial_adj, arch_mid, 
+                                              arch_lateral_adj] 
         
         
         # =========================================================================
@@ -325,11 +363,7 @@ class FOBuild:
     
     # =============================================================================
     
-    # Add Layers
-    rs.AddLayer("Neutral")
-    rs.AddLayer("Medial 5")
-    rs.AddLayer("Medial 10")
-    rs.AddLayer("Lateral 5")
+]
     
     
     # =============================================================================
