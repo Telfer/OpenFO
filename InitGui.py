@@ -4,9 +4,9 @@ class FOWorkbench (Workbench):
     #Icon = ##
     
     def Initialize(self):
-        import FOImport, FOLandmark, FOPosition
+        import FOImport, FOPosition, FORotate, FOTranslate, FOLandmark 
         
-        self.list = ["Import", "Position", "Landmark"]
+        self.list = ["Import", "Position", "Rotate", "Translate", "Landmark"]
         self.appendToolbar("Commands", self.list)
         self.appendMenu("New Menus", self.list)
 
