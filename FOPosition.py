@@ -68,6 +68,7 @@ class FOPosition:
                  
     def Activated(self):
         self.doc = FreeCAD.activeDocument()
+        main
         
         self.positions = {"lowest point of heel on the plantar surface": None,
                           "MTH1 on the plantar surface" : None,
@@ -332,5 +333,7 @@ def toString(u):
         s += str(u.x) + ", " + str(u.y) + ", " + str(u.z)
         s += ")"
         return s
+
+
 
 FreeCADGui.addCommand("Position", FOPosition())
