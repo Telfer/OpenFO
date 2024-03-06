@@ -17,6 +17,8 @@ import PySide.QtCore as QtCore
 from draftutils.translate import translate
 from PySide.QtCore import QT_TRANSLATE_NOOP
 
+from task_position import PositionTaskPanel
+
 
 ## outline data points (M9, M9.5, W8.5, M12)
 heel_center_pt_y = [-126, -132, -126, -134, -115, -122, -136, -142]
@@ -67,8 +69,14 @@ class FOPosition:
                  "ToolTip"  : "Position the foot correctly"}
                  
     def Activated(self):
+        self.ui = FreeCADGui.FOToolBar
+        self.view = FreeCADGui.activeView()
+        if self.ui:
+            self.ui.sourceCmd = self
+            self.task = PositionTaskPanel()
+            #FreeCADGui.Control.showDialog(self.task)
+        
         self.doc = FreeCAD.activeDocument()
-        main
         
         self.positions = {"lowest point of heel on the plantar surface": None,
                           "MTH1 on the plantar surface" : None,
@@ -80,18 +88,11 @@ class FOPosition:
                           "point_on_arch"
                           ]
         self.next_position = 0
-        self.Main()
-
-            
-    def Main(self):
-        # Select each position in self.positions
-        # Each position will be registered using the callback function self.logPosition
         print("Identify lowest point of heel on the plantar surface")
         self.view = FreeCADGui.activeView()
         self.active_position = "lowest point of heel on the plantar surface"
         self.doc = FreeCAD.activeDocument()
         self.clickCallback = self.view.addEventCallback("SoMouseButtonEvent",self.logPosition)
-   
     
     def logPosition(self, info):
         down = (info["State"] == "DOWN")
@@ -140,22 +141,19 @@ class FOPosition:
                     heel_pt_Y = self.positions["lowest point of heel on the plantar surface"]["y"]
                     heel_pt_Z = self.positions["lowest point of heel on the plantar surface"]["z"]
                     
-                    foot_mid = [(ff_mid[0] + heel_pt_X) / 2,(ff_mid[1] + heel_pt_Y) / 2, (ff_mid[2] + heel_pt_Z) / 2]
+                    self.foot_mid = [(ff_mid[0] + heel_pt_X) / 2,(ff_mid[1] + heel_pt_Y) / 2, (ff_mid[2] + heel_pt_Z) / 2]
                     self.midpoint = self.doc.addObject("Part::Vertex", "Foot Mid")
                     self.midpoint.Label = "Foot Mid"
-                    self.midpoint.X = foot_mid[0]
-                    self.midpoint.Y = foot_mid[1]
-                    self.midpoint.Z = foot_mid[2]
+                    self.midpoint.X = self.foot_mid[0]
+                    self.midpoint.Y = self.foot_mid[1]
+                    self.midpoint.Z = self.foot_mid[2]
                     self.doc.recompute()
                     self.moveMesh()
                     self.active_position = None
-                    self.point = self.doc.getObjectsByLabel("Mesh001")
-                    self.midpoint = self.doc.getObjectsByLabel("Mesh001")
-                    self.heel_pt = 0
-                    self.MTH1_pt = 0
-                    self.MTH5_pt = 0
-                    self.arch_pt = 0
+                    self.doc.recompute()
                     self.finish()
+                    FreeCADGui.Control.showDialog(self.task)
+                    FreeCADGui.ActiveDocument.ActiveView.fitAll()
             else:
                 pass   
     
@@ -202,8 +200,9 @@ class FOPosition:
         ##Confirm Left or Right foot:                           
         self.heel_pt = self.doc.getObjectsByLabel("lowest point of heel on the plantar surface")[0]
         self.MTH1_pt = self.doc.getObjectsByLabel("MTH1 on the plantar surface")[0]
-        self.MTH5_pt = self.doc.getObjectsByLabel("MTH5 on the plantar surface")[0]
+        
         self.arch_pt = self.doc.getObjectsByLabel("point on arch")[0]
+        self.MTH5_pt = self.doc.getObjectsByLabel("MTH5 on the plantar surface")[0]
 
         vec1 = [self.heel_pt.X - self.MTH1_pt.X, self.heel_pt.Y - self.MTH1_pt.Y, self.heel_pt.Z - self.MTH1_pt.Z]
         vec2 = [self.MTH5_pt.X - self.MTH1_pt.X, self.MTH5_pt.Y - self.MTH1_pt.Y, self.MTH5_pt.Z - self.MTH1_pt.Z]
@@ -222,13 +221,13 @@ class FOPosition:
         self.bs_Outline.buildFromPoles(points_outline, True)
         
         self.shoeEdge = self.doc.addObject("Part::Feature", "Shoe Edge")
+        #self.shoeEdge.LineColor=(0.52,0.51,0.75)
         self.shoeEdge.Shape = self.bs_Outline.toShape()
 
             
     def moveMesh(self):
         self.buildShoeShape(self.readJson())
         mesh_foot = self.doc.getObjectsByLabel("Mesh")[0]
-        #self.midpoint = self.doc.getObjectsByLabel("Foot Mid")[0]
 
         heel_pt_x = self.heel_pt.X - self.midpoint.X
         heel_pt_y = self.heel_pt.Y - self.midpoint.Y
@@ -278,17 +277,13 @@ class FOPosition:
         self.doc.recompute()
         
     def remove_objects(self):
-        FreeCADGui.Selection.clearSelection()
+        #FreeCADGui.Selection.clearSelection()
         for obj in self.doc.Objects:
-            print(f"Object: {obj} Label: {obj.Label} Type: obj.Type")
-            if obj.Label not in ["Shoe_Edge", "Mesh001", "point on arch", "Foot Mid"]:
+            if obj.Label not in ["Shoe_Edge", "Mesh001"]:
                 try:
-                    print(f"Removing {obj.Label}")
                     self.doc.removeObject(obj.Label.replace(' ', '_'))
-                    
                 except Exception as e:
                     print(f"Could not remove {obj.Label.replace(' ', '_')} exception {e}")
-            
         mesh_foot = self.doc.getObjectsByLabel("Mesh001")[0]
         self.doc.recompute()
 
@@ -333,7 +328,5 @@ def toString(u):
         s += str(u.x) + ", " + str(u.y) + ", " + str(u.z)
         s += ")"
         return s
-
-
 
 FreeCADGui.addCommand("Position", FOPosition())

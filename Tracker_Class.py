@@ -538,7 +538,6 @@ class lineTracker(Tracker):
     """A Line tracker, used by the tools that need to draw temporary lines"""
 
     def __init__(self):
-        print("start line tracker")
         line = coin.SoLineSet()
         dotted = False
         scolor = (0.0,0.0,0.0)

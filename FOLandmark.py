@@ -74,7 +74,7 @@ class ViewObserver:
                 filepath = os.path.expanduser("~/Documents/landmarkVariables.json")
                 with open(filepath, "w+") as write_file:
                     json.dump(self.positions, write_file)
-                print("Move on the next Step: Position")
+                print("Move on the next Step: Build")
             
         
 
