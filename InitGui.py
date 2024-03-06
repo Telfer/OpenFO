@@ -7,7 +7,7 @@ class FOWorkbench (Workbench):
         import FOGui
         import FOImport, FOPosition,FOLandmark
         
-        self.list = ["Import", "Position", "Landmark"]
+        self.list = ["Import", "Position", "Rotate", "Translate", "Landmark"]
         self.appendToolbar("Commands", self.list)
         self.appendMenu("New Menus", self.list)
 

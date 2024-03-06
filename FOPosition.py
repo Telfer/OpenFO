@@ -16,7 +16,6 @@ import Mesh
 import PySide.QtCore as QtCore
 from draftutils.translate import translate
 from PySide.QtCore import QT_TRANSLATE_NOOP
-
 from task_position import PositionTaskPanel
 
 
@@ -154,6 +153,7 @@ class FOPosition:
                     self.finish()
                     FreeCADGui.Control.showDialog(self.task)
                     FreeCADGui.ActiveDocument.ActiveView.fitAll()
+
             else:
                 pass   
     
@@ -200,9 +200,10 @@ class FOPosition:
         ##Confirm Left or Right foot:                           
         self.heel_pt = self.doc.getObjectsByLabel("lowest point of heel on the plantar surface")[0]
         self.MTH1_pt = self.doc.getObjectsByLabel("MTH1 on the plantar surface")[0]
-        
+
         self.arch_pt = self.doc.getObjectsByLabel("point on arch")[0]
         self.MTH5_pt = self.doc.getObjectsByLabel("MTH5 on the plantar surface")[0]
+
 
         vec1 = [self.heel_pt.X - self.MTH1_pt.X, self.heel_pt.Y - self.MTH1_pt.Y, self.heel_pt.Z - self.MTH1_pt.Z]
         vec2 = [self.MTH5_pt.X - self.MTH1_pt.X, self.MTH5_pt.Y - self.MTH1_pt.Y, self.MTH5_pt.Z - self.MTH1_pt.Z]
@@ -221,9 +222,7 @@ class FOPosition:
         self.bs_Outline.buildFromPoles(points_outline, True)
         
         self.shoeEdge = self.doc.addObject("Part::Feature", "Shoe Edge")
-        #self.shoeEdge.LineColor=(0.52,0.51,0.75)
         self.shoeEdge.Shape = self.bs_Outline.toShape()
-
             
     def moveMesh(self):
         self.buildShoeShape(self.readJson())
