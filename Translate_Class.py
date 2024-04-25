@@ -27,9 +27,8 @@ class FOTranslate(gui_base_original.Modifier):
         return {'MenuText': QT_TRANSLATE_NOOP("Translate", "Move"),
                 'ToolTip': QT_TRANSLATE_NOOP("Translate", "Moves the selected objects from one base point to another point.\nIf the \"copy\" option is active, it will create displaced copies.\nCTRL to snap, SHIFT to constrain.")}
 
-    def Activated(self):
+    def Activated(self, orientation):
         """Execute when the command is called."""
-        #super(FOTranslate, self).Activated(name="Move",is_subtool=isinstance(App.activeDraftCommand, SubelementHighlight))
         self.ghosts = []
         self.lines = []
         self.view = Gui.ActiveDocument.ActiveView
@@ -44,48 +43,18 @@ class FOTranslate(gui_base_original.Modifier):
         self.trans.translation.setValue([0, 0, 0])
         self.sep = coin.SoSeparator()
         self.autoinvert = True
-        print("Select an object to move")
         self.get_object_selection()
         
     def get_object_selection(self):
         """Get the object selection."""
-        #if Gui.Selection.getSelectionEx():
-            #return self.proceed()
-        self.call = self.view.addEventCallback("SoEvent", self.select_object)
-    
-    def select_object(self, arg):
-        """Handle the selection of objects depending on buttons pressed.
-
-        This is a scene event handler, to be called from the Draft tools
-        when they need to select an object.
-        ::
-            self.call = self.view.addEventCallback("SoEvent", select_object)
-
-        Parameters
-        ----------
-        arg: Coin event
-            The Coin event received from the 3D view.
-
-            If it is of type Keyboard and the `ESCAPE` key, it runs the `finish`
-            method of the active command.
-
-            If Ctrl key is pressed, multiple selection is enabled until the
-            button is released.
-            Then it runs the `proceed` method of the active command
-            to continue with the command's logic.
-        """
-        if arg["Type"] == "SoKeyboardEvent":
-            if arg["Key"] == "ESCAPE":
-                self.finish()
-        elif not arg["CtrlDown"] and Gui.Selection.hasSelection():
-            print("Pick start point")
-            self.proceed()
+        obj = self.doc.getObject('Mesh001')
+        Gui.Selection.addSelection(obj)
+        self.proceed()
             
             
     def proceed(self):
         """Continue with the command after a selection has been made."""
-        if self.call:
-            self.view.removeEventCallback("SoEvent", self.call)
+        print("Pick start point")
         self.selected_objects = Gui.Selection.getSelection()
         self.selected_objects = groups.get_group_contents(self.selected_objects,
                                       addgroups=True,

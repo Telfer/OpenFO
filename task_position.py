@@ -14,6 +14,8 @@ class PositionTaskPanel:
        self.form.setWindowTitle("Position")
        
        FreeCADGui.ActiveDocument.ActiveView.fitAll()
+       FreeCADGui.ActiveDocument.ActiveView.viewTop()
+       self.orientation = 1
        
        QtCore.QObject.connect(self.form.translateButton, QtCore.SIGNAL("clicked()"), self.move)
        QtCore.QObject.connect(self.form.rotateButton, QtCore.SIGNAL("clicked()"), self.rotate)
@@ -35,29 +37,15 @@ class PositionTaskPanel:
        self.orientation = 3
        FreeCADGui.ActiveDocument.ActiveView.viewFront()
    
-   def read_orientation (self):
-       if self.orientation == 1:
-           FreeCADGui.ActiveDocument.ActiveView.viewLeft()
-           print("1")
-       elif self.orientation == 2:
-           FreeCADGui.ActiveDocument.ActiveView.viewTop()
-           print("2")
-       elif self.orientation == 3:
-           FreeCADGui.ActiveDocument.ActiveView.viewFront()
-           print("3")
+   def get_orient(self):
+       return self.orientation
 
    def move(self):
        """Assign the selected file."""
-       #read_orientation()
        mover = Translate_Class.FOTranslate()
-       mover.Activated()
+       mover.Activated(self.orientation)
         
    def rotate(self):
-       #self.read_orientation()
        rotater = Rotate_Class.FORotate()
-       rotater.Activated()
+       rotater.Activated(self.orientation)
 
-
-
-#panel = ImportTaskPanel()
-#FreeCADGui.Control.showDialog(panel)

@@ -35,25 +35,14 @@ class FORotate(gui_base_original.Modifier):
 
     def Activated(self, orientation=1):
         """Execute when the command is called."""
-        dotted=False
-        scolor=(0.0,0.0,0.0)
-        swidth=None,
-        start=0
-        end=math.pi*2
         normal=None
-       
-        w=Vector(0, 0, 1)
         pos=Vector(0, 0, 0)
-        print("Select Foot Mesh")
         self.ghosts = []
         self.lines = []
         self.view = Gui.ActiveDocument.ActiveView
         self.orient = orientation
-        #self.u = Vector(1, 0, 0)
-        #self.v = Vector(0, 1, 0)
         self.define_plane()
         self.planetrack = Tracker_Class.PlaneTracker(self.u, self.v)
-        self.axis = w
         self.commitList = []
         self.position = pos
         self.arctrack = None
@@ -61,8 +50,8 @@ class FORotate(gui_base_original.Modifier):
         self.setup()
         self.circle = None
         self.doc = App.ActiveDocument
-        self.startangle = math.degrees(start)
-        self.endangle = math.degrees(end)
+        self.startangle = math.degrees(0)
+        self.endangle = math.degrees(math.pi*2)
         self.trans = coin.SoTransform()
         self.trans.translation.setValue([0, 0, 0])
         self.sep = coin.SoSeparator()
@@ -70,34 +59,28 @@ class FORotate(gui_base_original.Modifier):
         self.get_object_selection()
 
     def define_plane(self):
-        if self.orient == 1: #top
+        if self.orient == 1: 
+            self.axis = Vector(0,0,1)
             self.u = Vector(1,0,0)
             self.v = Vector(0,1,0)
-        elif self.orient == 2: #left
-            self.u = Vector(1,0,0)
+        elif self.orient == 2: 
+            self.axis = Vector(-1,0,0)
+            self.u = Vector(0,-1,0)
             self.v = Vector(0,0,1)
-        elif self.orient == 3: #front
-            self.u = Vector(0,1,0)
+        elif self.orient == 3:  
+            self.axis = Vector(0,-1,0)
+            self.u = Vector(1,0,0)
             self.v = Vector(0,0,1)
     
     def get_object_selection(self):
         """Get the object selection."""
-        #if Gui.Selection.getSelection():
-        #    return self.proceed()
-        self.call = self.view.addEventCallback("SoEvent", self.select_object)
-        
-    def select_object(self, arg):
-        """Handle the selection of objects depending on buttons pressed."""
-        if arg["Type"] == "SoKeyboardEvent":
-            if arg["Key"] == "ESCAPE":
-                self.finish()
-        elif not arg["CtrlDown"] and Gui.Selection.hasSelection():
-            self.proceed()
+        obj = self.doc.getObject('Mesh001')
+        Gui.Selection.addSelection(obj)
+        self.proceed()
+
         
     def proceed(self):
         """Continue with the command after a selection has been made."""
-        if self.call:
-            self.view.removeEventCallback("SoEvent", self.call)
         self.selected_objects = Gui.Selection.getSelection()
         self.selected_objects = groups.get_group_contents(self.selected_objects,
                                       addgroups=True,
@@ -204,7 +187,6 @@ class FORotate(gui_base_original.Modifier):
         self.rad = dist(self.point, self.center)
         self.arctrack.on()
         self.arctrack.setStartPoint(self.point)
-        #self.set_lines()
         for ghost in self.ghosts:
             ghost.on()
         self.step = 2
@@ -389,9 +371,7 @@ class FORotate(gui_base_original.Modifier):
         """Set up the working plane if it exists but is undefined."""
         self.weak = True
         if self.weak or force:
-            if direction and point:
-                self.alignToPointAndAxis(point, direction, 0, upvec)
-            elif True:
+            if True:
                 try:
                     from pivy import coin
                     view = Gui.ActiveDocument.ActiveView
@@ -409,6 +389,8 @@ class FORotate(gui_base_original.Modifier):
                                                  vdir.negative(), 0, upvec)
                 except Exception:
                     pass
+            else:
+                pass
             if force:
                 self.weak = False
             else: 
@@ -430,21 +412,12 @@ class FORotate(gui_base_original.Modifier):
         return p
         
 
-    
     def alignToPointAndAxis(self, point, axis, offset=0, upvec=None):
         """Align the working plane to a point and an axis (vector)."""
         self.doc = App.ActiveDocument
         self.axis = axis
         self.axis.normalize()
-        if axis.getAngle(Vector(1, 0, 0)) < 0.00001:
-            self.axis = Vector(1, 0, 0)
-            self.u = Vector(0, 1, 0)
-            self.v = Vector(0, 0, 1)
-        elif axis.getAngle(Vector(-1, 0, 0)) < 0.00001:
-            self.axis = Vector(-1, 0, 0)
-            self.u = Vector(0, -1, 0)
-            self.v = Vector(0, 0, 1)
-        elif upvec:
+        if upvec:
             self.u = upvec.cross(self.axis)
             self.u.normalize()
             self.v = self.axis.cross(self.u)
@@ -510,9 +483,6 @@ class ToDo:
                     App.activeDocument().commitTransaction()
                 except Exception:
                     pass
-            # Restack Draft screen widgets after creation
-            #if hasattr(Gui, "Snapper"):
-                #Gui.Snapper.restack()
         ToDo.commitlist = []
 
         for f, arg in ToDo.afteritinerary:

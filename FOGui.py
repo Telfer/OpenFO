@@ -145,11 +145,11 @@ class FOToolBar:
         # add only a dummy widget, since widgets are created on demand
         self.baseWidget = FOBaseWidget()
         self.tray = QtGui.QToolBar(None)
-        self.tray.setObjectName("Draft tray")
-        self.tray.setWindowTitle("Draft tray")
+        #self.tray.setObjectName("Draft tray")
+        #self.tray.setWindowTitle("Draft tray")
         self.toptray = self.tray
         self.bottomtray = self.tray
-        self.setupTray()
+        #self.setupTray()
         self.setupStyle()
         mw = FreeCADGui.getMainWindow()
         mw.addToolBar(self.tray)
@@ -398,10 +398,10 @@ class FOToolBar:
     def setupTray(self):
         """sets draft tray buttons up"""
 
-        self.wplabel = self._pushbutton(
-            "wplabel", self.toptray, icon='Draft_SelectPlane',
-            hide=False,width=120)
-        defaultWP = 0#Draft.getParam("defaultWP",0)
+        #self.wplabel = self._pushbutton(
+        #    "wplabel", self.toptray, icon='Draft_SelectPlane',
+        #    hide=False,width=120)
+        #defaultWP = 0#Draft.getParam("defaultWP",0)
         # if defaultWP == 1:
             # self.wplabel.setText(translate("draft","Top"))
         # elif defaultWP == 2:
@@ -433,6 +433,7 @@ class FOToolBar:
         #QtCore.QObject.connect(self.autoGroupButton,QtCore.SIGNAL("pressed()"),self.runAutoGroup)
 
         #QtCore.QTimer.singleShot(2000,self.retranslateTray) # delay so translations get a chance to load
+        pass
 
     def setupStyle(self):
         style = "#constrButton:Checked {background-color: "
@@ -701,7 +702,7 @@ class FOToolBar:
             combo.addItem(s)
         combo.setCurrentIndex(types.index(Draft.getParam("labeltype","Custom")))
         l.addWidget(combo)
-        QtCore.QObject.connect(combo,QtCore.SIGNAL("currentIndexChanged(int)"),callback)
+        #QtCore.QObject.connect(combo,QtCore.SIGNAL("currentIndexChanged(int)"),callback)
         self.pointUi(title=title, extra=w, icon="Draft_Label")
 
     def extraUi(self):
@@ -1520,24 +1521,15 @@ class FOToolBar:
     def setWatchers(self):
         class FOCreateWatcher:
             def __init__(self):
-                self.commands = ["Import", "Position", "Landmark"]
+                self.commands = ["Import", "Position", "Landmark", "Build"]
                 self.title = "Create objects"
             def shouldShow(self):
                 return (FreeCAD.ActiveDocument is not None) and (not FreeCADGui.Selection.getSelection())
 
-        # class FOModifyWatcher:
-            # def __init__(self):
-                # self.commands = ["Translate","Rotate"]
-                # self.title = "Modify objects"
-            # def shouldShow(self):
-                # return True
-                # #return (FreeCAD.ActiveDocument is not None) and (FreeCADGui.Selection.getSelection() != [])
-
-        FreeCADGui.Control.addTaskWatcher([FOCreateWatcher()]) #FOModifyWatcher()])
+        FreeCADGui.Control.addTaskWatcher([FOCreateWatcher()]) 
 
     def changeEvent(self, event):
         if event.type() == QtCore.QEvent.LanguageChange:
-            #print("Language changed!")
             self.ui.retranslateUi(self)
 
     def Activated(self):

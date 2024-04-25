@@ -7,6 +7,8 @@
 #===================================
 
 import FreeCAD, FreeCADGui
+import Draft
+import Part
 from task_import import ImportTaskPanel
 
 class FOImport:

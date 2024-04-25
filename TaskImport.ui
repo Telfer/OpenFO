@@ -126,6 +126,9 @@
           <property name="suffix">
            <string> mm</string>
           </property>
+		  <property name="editable">
+           <bool>false</bool>
+          </property>
           <property name="minimum">
            <number>2</number>
           </property>
@@ -148,6 +151,9 @@
          <widget class="QSpinBox" name="postingOut">
           <property name="suffix">
            <string> degrees</string>
+          </property>
+		  <property name="editable">
+           <bool>false</bool>
           </property>
           <property name="prefix">
            <string/>

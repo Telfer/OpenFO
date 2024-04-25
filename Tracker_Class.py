@@ -16,7 +16,7 @@ from todo import ToDo
 class Tracker:
     """A generic Draft Tracker, to be used by other specific trackers."""
 
-    def __init__(self, dotted=False, scolor=(0.0,0.0,0.0), swidth=20,
+    def __init__(self, dotted=False, scolor=(0.0,0.0,0.0), swidth=2,
                  children=[], ontop=False, name=None):
         global Part, DraftGeomUtils
         import Part
