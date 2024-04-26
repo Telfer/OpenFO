@@ -371,3 +371,57 @@ def redraw_3d_view():
         Gui.ActiveDocument.ActiveView.redraw()
     except AttributeError as err: 
         print(err)
+        
+def cross(v1, v2):
+    cx = [v1[1] * v2[2] - v1[2] * v2[1],
+          v1[2] * v2[0] - v1[0] * v2[2],
+          v1[0] * v2[1] - v1[1] * v2[0]]
+    return cx
+
+def dot(v1, v2):
+    dp = v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2]
+    return dp
+
+def toString(u):
+    if isinstance(u, list):
+        s = "["
+        first = True
+        for v in u:
+            s += "FreeCAD.Vector("
+            s += str(v.x) + ", " + str(v.y) + ", " + str(v.z)
+            s += ")"
+            if first:
+                s += ", "
+                first = True
+        s = s.rstrip(", ")
+        s += "]"
+        return s
+    else:
+        s = "FreeCAD.Vector("
+        s += str(u.x) + ", " + str(u.y) + ", " + str(u.z)
+        s += ")"
+        return s
+        
+def dist_2_points(p1, p2):
+    d = math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
+    return d
+
+def proj_point_x(p1, p2, x_coord):
+    m = (p1[1] - p2[1]) / (p1[0] - p2[0])
+    c = p1[1] - (m * p1[0])
+    y_coord = (m * x_coord) + c
+    return y_coord
+
+def proj_point_y(p1, p2, y_coord):
+    m = (p1[1] - p2[1]) / (p1[0] - p2[0])
+    c = p1[1] - (m * p1[0])
+    x_coord = (y_coord - c) / m
+    return x_coord
+
+def point_on_line(x, y, offset):
+    d = math.sqrt((x[0] - y[0]) ** 2 + (x[1] - y[1]) ** 2)
+    t = offset / d
+    xt = ((1 - t) * x[0]) + (t * y[0])
+    yt = ((1 - t) * x[1]) + (t * y[1])
+    xx = [xt, yt, 0.0]
+    return xx

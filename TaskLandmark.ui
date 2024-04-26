@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FOLandmarkGui</class>
+ <widget class="QWidget" name="FOLandmarkGui">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>455</width>
+    <height>283</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Landmark</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+	   <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Reselect Landmark Points:</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
+	<widget class="QToolButton" name="latHeel">
+	 <property name="text">
+	  <string>Lateral Heel</string>
+	 </property>
+	</widget>
+   </item>
+   <item>
+	<widget class="QToolButton" name="postHeel">
+	 <property name="text">
+	  <string>Posterior Heel</string>
+	 </property>
+	</widget>
+	</item>
+	<item>
+	<widget class="QToolButton" name="medHeel">
+	 <property name="text">
+	  <string>Medial Heel</string>
+	 </property>
+	</widget>
+	</item>
+	<item>
+	<widget class="QToolButton" name="latArch">
+	 <property name="text">
+	  <string>Lateral Arch</string>
+	 </property>
+	</widget>
+	</item>
+	<item>
+	<widget class="QToolButton" name="medArch">
+	 <property name="text">
+	  <string>Medial Arch</string>
+	 </property>
+	</widget>
+	</item>
+	<item>
+	<widget class="QToolButton" name="medMTH1">
+	 <property name="text">
+	  <string>Medial Side of MTH1</string>
+	 </property>
+	</widget>
+	</item>
+	<item>
+	<widget class="QToolButton" name="latMTH5">
+	 <property name="text">
+	  <string>Lateral Side of MTH5</string>
+	 </property>
+	</widget>
+	</item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
