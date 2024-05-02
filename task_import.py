@@ -3,11 +3,14 @@ import json
 import Mesh
 import os
 import PySide.QtCore as QtCore
+import pathlib
 
 class ImportTaskPanel:
    def __init__(self):
        # this will create a Qt widget from our ui file
-       self.form = FreeCADGui.PySideUic.loadUi(r"C:\Users\hanam\AppData\Roaming\FreeCAD\Mod\Hana_workbenchFO\TaskImport.ui")##NEED TO FIX
+       cwd = str(pathlib.Path(__file__).parent.resolve())
+       filepathform = cwd + "\TaskImport.ui"
+       self.form = FreeCADGui.PySideUic.loadUi(filepathform)
        QtCore.QObject.connect(self.form.browse, QtCore.SIGNAL("fileNameSelected(const QString&)"), self.fileSelect)
  
    def fileSelect(self, fn):
