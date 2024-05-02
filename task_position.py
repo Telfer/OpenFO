@@ -5,11 +5,14 @@ import os
 import Rotate_Class
 import Translate_Class
 import PySide.QtCore as QtCore
+import pathlib 
 
 class PositionTaskPanel:
    def __init__(self):
        # this will create a Qt widget from our ui file
-       self.form = FreeCADGui.PySideUic.loadUi(r"C:\Users\hanam\AppData\Roaming\FreeCAD\Mod\Hana_workbenchFO\TaskPosition.ui")
+       cwd = str(pathlib.Path(__file__).parent.resolve())
+       filepathform = cwd + "\TaskPosition.ui"
+       self.form = FreeCADGui.PySideUic.loadUi(filepathform)
        self.form.setObjectName("PositionTaskPanel")
        self.form.setWindowTitle("Position")
        

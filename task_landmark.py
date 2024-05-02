@@ -3,10 +3,14 @@ import json
 import Mesh
 import os
 import PySide.QtCore as QtCore
+import pathlib
 
 class LandmarkTaskPanel:
    def __init__(self):
        # this will create a Qt widget from our ui file
+       cwd = str(pathlib.Path(__file__).parent.resolve())
+       filepathform = cwd + "\TaskPosition.ui"
+       self.form = FreeCADGui.PySideUic.loadUi(filepathform)
        self.form = FreeCADGui.PySideUic.loadUi(r"C:\Users\hanam\AppData\Roaming\FreeCAD\Mod\Hana_workbenchFO\TaskLandmark.ui")
        self.form.setObjectName("LandmarkTaskPanel")
        self.form.setWindowTitle("Landmark")
