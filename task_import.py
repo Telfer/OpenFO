@@ -3,7 +3,7 @@ import json
 import Mesh
 import os
 import PySide.QtCore as QtCore
-import pathlib 
+import pathlib
 
 class ImportTaskPanel:
    def __init__(self):
