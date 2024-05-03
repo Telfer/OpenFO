@@ -26,8 +26,7 @@ class FOBuild:
         
         
         self.view = FreeCADGui.activeView()
-        self.build_FO(self.sides, self.FO_Thickness, self.medHeel, self.postHeel, self.latHeel, self.latArch, self.medArch, self.MTPJ1, self.MTPJ5, self.posting, self.heel_raise)
-        
+        self.build_FO(self.sides, self.FO_Thickness, self.medHeel, self.postHeel, self.latHeel, self.latArch, self.medArch, self.MTPJ1, self.MTPJ5, self.posting, 0.65, self.heel_raise)
         self.mesh_foot = self.doc.getObjectsByLabel("Mesh001")[0]
         
     def readJson(self):
@@ -39,7 +38,7 @@ class FOBuild:
         self.heel_raise = self.parameters['heel_raise']
         self.side = self.parameters['side']
         if self.side == "Left":
-            self.sides = 0
+            self.sides = -1
         else:
             self.sides = 1
         
@@ -117,7 +116,7 @@ class FOBuild:
     
     
     def build_FO(self, side, thickness, heel_medial, heel_center, heel_lateral,
-                 arch_lateral, arch_medial, mtpj1, mtpj5, posting, heel_offset):
+                 arch_lateral, arch_medial, mtpj1, mtpj5, posting, heel_offset, heel_rise):
         
         ## forefoot offset
         ff_offset = -5.0
@@ -235,8 +234,8 @@ class FOBuild:
                                                    posting, [0.0, 1.0, 0.0])
         
         # adjusted mtpj landmarks
-        mtpj1_adj = [mtpj1[0] + 2.0, mtpj1[1] - 10.0, ff_offset]
-        mtpj5_adj = [mtpj5[0] - 2.0, mtpj5[1] - 10.0, ff_offset]
+        mtpj1_adj = [mtpj1[0] - 2.0, mtpj1[1] - 10.0, ff_offset]
+        mtpj5_adj = [mtpj5[0] + 2.0, mtpj5[1] - 10.0, ff_offset]
         ff_center = [(mtpj1_adj[0] + mtpj5_adj[0]) / 2, 
                      ((mtpj1_adj[1] + mtpj5_adj[1]) / 2) + 4, ff_offset]
         
@@ -251,24 +250,24 @@ class FOBuild:
         # adjust mtpj landmarks
         mtpj1_prox1 = proj_point_y(mtpj1_adj, [arch_medial_adj[0], arch_medial_adj[1], ff_offset],
                                    mtpj1_adj[1] - 2)
-        mtpj1_prox1 = [mtpj1_prox1 + 0.4, mtpj1_adj[1] - 2, ff_offset]
+        mtpj1_prox1 = [mtpj1_prox1 - 0.4, mtpj1_adj[1] - 2, ff_offset]
         mtpj1_prox2 = proj_point_y(mtpj1_adj, [arch_medial_adj[0], arch_medial_adj[1], ff_offset], 
                                    mtpj1_adj[1] - 4)
         mtpj1_prox2 = [mtpj1_prox2, mtpj1_adj[1] - 4, ff_offset + 0.5]
         mtpj1_lateral1 = proj_point_x(ff_center, mtpj1_adj, mtpj1_adj[0] - 2)
-        mtpj1_lateral1 = [mtpj1_adj[0] + 2, mtpj1_lateral1 -0.4, ff_offset]
+        mtpj1_lateral1 = [mtpj1_adj[0] - 2, mtpj1_lateral1 -0.4, ff_offset]
         mtpj1_lateral2 = proj_point_x(ff_center, mtpj1_adj, mtpj1_adj[0] - 4)
-        mtpj1_lateral2 = [mtpj1_adj[0] + 4, mtpj1_lateral2, ff_offset]
+        mtpj1_lateral2 = [mtpj1_adj[0] - 4, mtpj1_lateral2, ff_offset]
         mtpj5_prox1 = proj_point_y(mtpj5_adj, [arch_lateral_adj[0], arch_lateral_adj[1], ff_offset], 
                                    mtpj5_adj[1] - 2)
-        mtpj5_prox1 = [mtpj5_prox1 - 0.4, mtpj5_adj[1] - 2, ff_offset]
+        mtpj5_prox1 = [mtpj5_prox1 + 0.4, mtpj5_adj[1] - 2, ff_offset]
         mtpj5_prox2 = proj_point_y(mtpj5_adj, [arch_lateral_adj[0], arch_lateral_adj[1], ff_offset], 
                                    mtpj5_adj[1] - 4)
         mtpj5_prox2 = [mtpj5_prox2, mtpj5_adj[1] - 4, ff_offset + 0.5]
         mtpj5_lateral1 = proj_point_x(ff_center, mtpj5_adj, mtpj5_adj[0] + 2)
-        mtpj5_lateral1 = [mtpj5_adj[0] - 2, mtpj5_lateral1 -0.4, ff_offset]
+        mtpj5_lateral1 = [mtpj5_adj[0] + 2, mtpj5_lateral1 -0.4, ff_offset]
         mtpj5_lateral2 = proj_point_x(ff_center, mtpj5_adj, mtpj5_adj[0] + 4)
-        mtpj5_lateral2 = [mtpj5_adj[0] - 4, mtpj5_lateral2, ff_offset]
+        mtpj5_lateral2 = [mtpj5_adj[0] + 4, mtpj5_lateral2, ff_offset]
         arch_mid = [(arch_medial[0] + arch_lateral[0]) / 2,
                     (arch_medial[1] + arch_lateral[1]) / 2, 5.0]
                     
