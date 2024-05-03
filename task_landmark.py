@@ -1,5 +1,4 @@
 import FreeCAD,FreeCADGui,Part
-import json
 import Mesh
 import os
 import PySide.QtCore as QtCore
@@ -9,9 +8,8 @@ class LandmarkTaskPanel:
    def __init__(self):
        # this will create a Qt widget from our ui file
        cwd = str(pathlib.Path(__file__).parent.resolve())
-       filepathform = cwd + "\TaskPosition.ui"
+       filepathform = cwd + "\TaskLandmark.ui"
        self.form = FreeCADGui.PySideUic.loadUi(filepathform)
-       #self.form = FreeCADGui.PySideUic.loadUi(r"C:\Users\hanam\AppData\Roaming\FreeCAD\Mod\Hana_workbenchFO\TaskLandmark.ui")
        self.form.setObjectName("LandmarkTaskPanel")
        self.form.setWindowTitle("Landmark")
        self.clickCallback = None
@@ -76,16 +74,7 @@ class LandmarkTaskPanel:
                 point.X = self.positionInfo["x"]
                 point.Y = self.positionInfo["y"]
                 point.Z = self.positionInfo["z"]
-                point.Label = self.active_position
-            # filepath = os.path.expanduser("~/Documents/landmarkVariables.json")
-            # f = open(filepath, "r") 
-            # self.params = json.loads(f.read())
-            # print (self.params)
-            # f.close()
-            # self.params[self.active_position] = self.positionInfo
-            # with open(filepath,"w") as write_file:
-                # json.dump(self.params, write_file)
-            
+                point.Label = self.active_position            
             self.doc.recompute()
             self.removeCall()
    

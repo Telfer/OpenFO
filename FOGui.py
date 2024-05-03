@@ -1544,6 +1544,7 @@ class FOToolBar:
         FreeCADGui.Control.clearTaskWatcher()
         if hasattr(self,"tray"):
             self.tray.hide()
+            print("Hidden")
 
     def reset_ui_values(self):
         """Method to reset task panel values"""

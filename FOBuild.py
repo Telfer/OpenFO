@@ -1,5 +1,4 @@
 import FreeCAD, FreeCADGui
-import json
 import Draft
 import Part, PartGui
 import os
@@ -20,65 +19,48 @@ class FOBuild:
 
     def Activated(self):
         FreeCADGui.SendMsgToActiveView("ViewFit")
-       
-        self.doc = FreeCAD.activeDocument()
-        self.readJson()
-        
-        
         self.view = FreeCADGui.activeView()
-        self.build_FO(self.sides, self.FO_Thickness, self.medHeel, self.postHeel, self.latHeel, self.latArch, self.medArch, self.MTPJ1, self.MTPJ5, self.posting, 0.65, self.heel_raise)
-        self.mesh_foot = self.doc.getObjectsByLabel("Mesh001")[0]
-        
-    def readJson(self):
-        filepathImport = os.path.expanduser("~/Documents/importVariables.json")
-        f = open(filepathImport, "r") 
-        self.parameters = json.loads(f.read())
-        self.FO_Thickness = self.parameters['FO_thickness']
-        self.posting = self.parameters['posting']
-        self.heel_raise = self.parameters['heel_raise']
-        self.side = self.parameters['side']
-        if self.side == "Left":
-            self.sides = -1
-        else:
-            self.sides = 1
-        
-        # filepathLandmark = os.path.expanduser("~/Documents/landmarkVariables.json")
-        # f = open(filepathLandmark, "r") 
-        # self.parameters = json.loads(f.read())
-        
-        # self.latHeel = self.parameters["point on lateral side of heel"]
-        # self.latHeel = [self.latHeel['x'], self.latHeel['y'], self.latHeel['z']]
-        # self.postHeel = self.parameters["point on posterior of heel"]
-        # self.postHeel = [self.postHeel['x'], self.postHeel['y'], self.postHeel['z']]
-        # self.medHeel = self.parameters["point on medial side of heel"]
-        # self.medHeel = [self.medHeel['x'], self.medHeel['y'], self.medHeel['z']]
-        # self.latArch = self.parameters["highest point on lateral arch"]
-        # self.latArch = [self.latArch['x'], self.latArch['y'], self.latArch['z']]
-        # self.medArch = self.parameters["highest point on medial arch"]
-        # self.medArch = [self.medArch['x'], self.medArch['y'], self.medArch['z']]
-        # self.MTPJ1 = self.parameters["the medial side of the distal MTH1"]
-        # self.MTPJ1 = [self.MTPJ1['x'], self.MTPJ1['y'], self.MTPJ1['z']]
-        # self.MTPJ5 = self.parameters["the lateral side of the distal MTH5"]
-        # self.MTPJ5 = [self.MTPJ5['x'], self.MTPJ5['y'], self.MTPJ5['z']]
-        
-        self.latHeel = self.doc.getObjectsByLabel("point on lateral side of heel")[0]
-        self.latHeel = self.returnPoint(self.latHeel)
-        self.postHeel = self.doc.getObjectsByLabel("point on posterior of heel")[0]
-        self.postHeel = self.returnPoint(self.postHeel)
-        self.medHeel = self.doc.getObjectsByLabel("point on medial side of heel")[0]
-        self.medHeel = self.returnPoint(self.medHeel)
-        self.latArch = self.doc.getObjectsByLabel("highest point on lateral arch")[0]
-        self.latArch = self.returnPoint(self.latArch)
-        self.medArch = self.doc.getObjectsByLabel("highest point on medial arch")[0]
-        self.medArch = self.returnPoint(self.medArch)
-        self.MTPJ1 = self.doc.getObjectsByLabel("the medial side of the distal MTH1")[0]
-        self.MTPJ1 = self.returnPoint(self.MTPJ1)
-        self.MTPJ5 = self.doc.getObjectsByLabel("the lateral side of the distal MTH5")[0]
-        self.MTPJ5 = self.returnPoint(self.MTPJ5)
+        self.doc = FreeCAD.activeDocument()
+        if self.get_params():
+            self.build_FO(self.sides, self.FO_Thickness, self.medHeel, self.postHeel, self.latHeel, self.latArch, self.medArch, self.MTPJ1, self.MTPJ5, self.posting, 0.65, self.heel_raise)
+
+    
+    def get_params(self):
+        try:
+            self.FO_Thickness = int(self.doc.getObjectsByLabel("FO_thickness")[0].X)
+            self.posting = int(self.doc.getObjectsByLabel("posting")[0].X)
+            self.heel_raise = int(self.doc.getObjectsByLabel("heel_raise")[0].X)
+        except:
+            print("Complete Import function first")
+            return False
+        try: 
+            self.sides = int(self.doc.getObjectsByLabel("side")[0].X)
+            self.mesh_foot = self.doc.getObjectsByLabel("Mesh001")[0]
+        except:
+            print("Complete Position function first")
+            return False
+        try:
+            self.latHeel = self.doc.getObjectsByLabel("point on lateral side of heel")[0]
+            self.latHeel = self.returnPoint(self.latHeel)
+            self.postHeel = self.doc.getObjectsByLabel("point on posterior of heel")[0]
+            self.postHeel = self.returnPoint(self.postHeel)
+            self.medHeel = self.doc.getObjectsByLabel("point on medial side of heel")[0]
+            self.medHeel = self.returnPoint(self.medHeel)
+            self.latArch = self.doc.getObjectsByLabel("highest point on lateral arch")[0]
+            self.latArch = self.returnPoint(self.latArch)
+            self.medArch = self.doc.getObjectsByLabel("highest point on medial arch")[0]
+            self.medArch = self.returnPoint(self.medArch)
+            self.MTPJ1 = self.doc.getObjectsByLabel("the medial side of the distal MTH1")[0]
+            self.MTPJ1 = self.returnPoint(self.MTPJ1)
+            self.MTPJ5 = self.doc.getObjectsByLabel("the lateral side of the distal MTH5")[0]
+            self.MTPJ5 = self.returnPoint(self.MTPJ5)
+        except:
+            print("Complete Landmark function first")
+            return False
+        return True
     
     def returnPoint(self, obj):
         returnpoint = [float(obj.X), float(obj.Y), float(obj.Z)]
-        print(returnpoint)
         return returnpoint
     
     def rot_point_coords(self, pt, center, angle, axis):
@@ -95,9 +77,9 @@ class FOBuild:
         return point2
         
     def makePoint(self, label, newpoint):
-        if self.doc.getObjectsByLabel(label.replace(' ', '_')) != []:
+        if self.doc.getObjectsByLabel(label) != []:
             #If landmark already set, change current landmark
-            point = self.doc.getObjectsByLabel(label.replace(' ', '_'))[0]
+            point = self.doc.getObjectsByLabel(label)[0]
             point.X = newpoint[0]
             point.Y = newpoint[1]
             point.Z = newpoint[2]
@@ -159,14 +141,69 @@ class FOBuild:
         
         if (ff_d > 90):
             x = (ff_d - 85) / 2
-            mtpj1 = [mtpj1[0] - x, mtpj1[1], mtpj1[2]]
-            mtpj5 = [mtpj5[0] + x, mtpj5[1], mtpj5[2]]
-        
-        
+            mtpj1 = [mtpj1[0] + x, mtpj1[1], mtpj1[2]]
+            mtpj5 = [mtpj5[0] - x, mtpj5[1], mtpj5[2]]
+
         # =========================================================================
         
+        # calculated landmarks
+        
+        ## adjusted heel landmarks
+        heel_center_med_offset = ((heel_medial[0] - heel_center[0]) * heel_offset)
+        heel_center_medial = [heel_center[0] + heel_center_med_offset,
+                              heel_center[1] + 5, heel_center[2]]
+        if posting != 0:
+            heel_center_medial = self.rot_point_coords(heel_center_medial, heel_center, 
+                                                  posting, [0.0, 1.0, 0.0])
+        heel_center_lat_offset = -1 * ((heel_lateral[0] - heel_center[0]) * heel_offset)
+        heel_center_lateral = [heel_center[0] - heel_center_lat_offset, 
+                               heel_center[1] + 5, heel_center[2]]
+        if posting != 0:
+            heel_center_lateral = self.rot_point_coords(heel_center_lateral, heel_center, 
+                                                   posting, [0.0, 1.0, 0.0])
+        
+        # adjusted mtpj landmarks
+        mtpj1_adj = [mtpj1[0] + 2.0, mtpj1[1] - 10.0, ff_offset]
+        mtpj5_adj = [mtpj5[0] - 2.0, mtpj5[1] - 10.0, ff_offset]
+        ff_center = [(mtpj1_adj[0] + mtpj5_adj[0]) / 2, 
+                     ((mtpj1_adj[1] + mtpj5_adj[1]) / 2) + 4, ff_offset]
+        
+        
+        # adjusted arch landmarks
+        if arch_lateral[2] > 12:    
+            arch_lateral[2] = 12
+        arch_medial_adj = proj_point_y(heel_medial, mtpj1_adj, arch_medial[1])
+        arch_medial_adj = [arch_medial_adj, arch_medial[1], arch_medial[2]]
+        arch_lateral_adj = proj_point_y(heel_lateral, mtpj5_adj, arch_lateral[1])
+        arch_lateral_adj = [arch_lateral_adj, arch_lateral[1], arch_lateral[2]]
+        
+        # adjust mtpj landmarks
+        mtpj1_prox1 = proj_point_y(mtpj1_adj, [arch_medial_adj[0], arch_medial_adj[1], ff_offset],
+                                   mtpj1_adj[1] - 2)
+        mtpj1_prox1 = [mtpj1_prox1 + 0.4, mtpj1_adj[1] - 2, ff_offset]
+        mtpj1_prox2 = proj_point_y(mtpj1_adj, [arch_medial_adj[0], arch_medial_adj[1], ff_offset], 
+                                   mtpj1_adj[1] - 4)
+        mtpj1_prox2 = [mtpj1_prox2, mtpj1_adj[1] - 4, ff_offset + 0.5]
+        mtpj1_lateral1 = proj_point_x(ff_center, mtpj1_adj, mtpj1_adj[0] - 2)
+        mtpj1_lateral1 = [mtpj1_adj[0] + 2, mtpj1_lateral1 -0.4, ff_offset]
+        mtpj1_lateral2 = proj_point_x(ff_center, mtpj1_adj, mtpj1_adj[0] - 4)
+        mtpj1_lateral2 = [mtpj1_adj[0] + 4, mtpj1_lateral2, ff_offset]
+        mtpj5_prox1 = proj_point_y(mtpj5_adj, [arch_lateral_adj[0], arch_lateral_adj[1], ff_offset], 
+                                   mtpj5_adj[1] - 2)
+        mtpj5_prox1 = [mtpj5_prox1 - 0.4, mtpj5_adj[1] - 2, ff_offset]
+        mtpj5_prox2 = proj_point_y(mtpj5_adj, [arch_lateral_adj[0], arch_lateral_adj[1], ff_offset], 
+                                   mtpj5_adj[1] - 4)
+        mtpj5_prox2 = [mtpj5_prox2, mtpj5_adj[1] - 4, ff_offset + 0.5]
+        mtpj5_lateral1 = proj_point_x(ff_center, mtpj5_adj, mtpj5_adj[0] + 2)
+        mtpj5_lateral1 = [mtpj5_adj[0] - 2, mtpj5_lateral1 -0.4, ff_offset]
+        mtpj5_lateral2 = proj_point_x(ff_center, mtpj5_adj, mtpj5_adj[0] + 4)
+        mtpj5_lateral2 = [mtpj5_adj[0] - 4, mtpj5_lateral2, ff_offset]
+        arch_mid = [(arch_medial[0] + arch_lateral[0]) / 2,
+                    (arch_medial[1] + arch_lateral[1]) / 2, 5.0]
+              
         # # calculated landmarks
-        # ## adjusted heel landmarks
+        
+        # #adjusted heel landmarks
         # heel_center_med_offset = ((heel_medial[0] - heel_center[0]) * heel_offset)
         # heel_center_medial = [heel_center[0] + heel_center_med_offset,
                               # heel_center[1] + 5, heel_center[2]]
@@ -218,59 +255,6 @@ class FOBuild:
         # arch_mid = [(arch_medial[0] + arch_lateral[0]) / 2,
                     # (arch_medial[1] + arch_lateral[1]) / 2, 5.0]
                     
-        # calculated landmarks
-        ## adjusted heel landmarks
-        heel_center_med_offset = ((heel_medial[0] - heel_center[0]) * heel_offset)
-        heel_center_medial = [heel_center[0] + heel_center_med_offset,
-                              heel_center[1] + 5, heel_center[2]]
-        if posting != 0:
-            heel_center_medial = self.rot_point_coords(heel_center_medial, heel_center, 
-                                                  posting, [0.0, 1.0, 0.0])
-        heel_center_lat_offset = -1 * ((heel_lateral[0] - heel_center[0]) * heel_offset)
-        heel_center_lateral = [heel_center[0] - heel_center_lat_offset, 
-                               heel_center[1] + 5, heel_center[2]]
-        if posting != 0:
-            heel_center_lateral = self.rot_point_coords(heel_center_lateral, heel_center, 
-                                                   posting, [0.0, 1.0, 0.0])
-        
-        # adjusted mtpj landmarks
-        mtpj1_adj = [mtpj1[0] - 2.0, mtpj1[1] - 10.0, ff_offset]
-        mtpj5_adj = [mtpj5[0] + 2.0, mtpj5[1] - 10.0, ff_offset]
-        ff_center = [(mtpj1_adj[0] + mtpj5_adj[0]) / 2, 
-                     ((mtpj1_adj[1] + mtpj5_adj[1]) / 2) + 4, ff_offset]
-        
-        # adjusted arch landmarks
-        if arch_lateral[2] > 12:    
-            arch_lateral[2] = 12
-        arch_medial_adj = proj_point_y(heel_medial, mtpj1_adj, arch_medial[1])
-        arch_medial_adj = [arch_medial_adj, arch_medial[1], arch_medial[2]]
-        arch_lateral_adj = proj_point_y(heel_lateral, mtpj5_adj, arch_lateral[1])
-        arch_lateral_adj = [arch_lateral_adj, arch_lateral[1], arch_lateral[2]]
-        
-        # adjust mtpj landmarks
-        mtpj1_prox1 = proj_point_y(mtpj1_adj, [arch_medial_adj[0], arch_medial_adj[1], ff_offset],
-                                   mtpj1_adj[1] - 2)
-        mtpj1_prox1 = [mtpj1_prox1 - 0.4, mtpj1_adj[1] - 2, ff_offset]
-        mtpj1_prox2 = proj_point_y(mtpj1_adj, [arch_medial_adj[0], arch_medial_adj[1], ff_offset], 
-                                   mtpj1_adj[1] - 4)
-        mtpj1_prox2 = [mtpj1_prox2, mtpj1_adj[1] - 4, ff_offset + 0.5]
-        mtpj1_lateral1 = proj_point_x(ff_center, mtpj1_adj, mtpj1_adj[0] - 2)
-        mtpj1_lateral1 = [mtpj1_adj[0] - 2, mtpj1_lateral1 -0.4, ff_offset]
-        mtpj1_lateral2 = proj_point_x(ff_center, mtpj1_adj, mtpj1_adj[0] - 4)
-        mtpj1_lateral2 = [mtpj1_adj[0] - 4, mtpj1_lateral2, ff_offset]
-        mtpj5_prox1 = proj_point_y(mtpj5_adj, [arch_lateral_adj[0], arch_lateral_adj[1], ff_offset], 
-                                   mtpj5_adj[1] - 2)
-        mtpj5_prox1 = [mtpj5_prox1 + 0.4, mtpj5_adj[1] - 2, ff_offset]
-        mtpj5_prox2 = proj_point_y(mtpj5_adj, [arch_lateral_adj[0], arch_lateral_adj[1], ff_offset], 
-                                   mtpj5_adj[1] - 4)
-        mtpj5_prox2 = [mtpj5_prox2, mtpj5_adj[1] - 4, ff_offset + 0.5]
-        mtpj5_lateral1 = proj_point_x(ff_center, mtpj5_adj, mtpj5_adj[0] + 2)
-        mtpj5_lateral1 = [mtpj5_adj[0] + 2, mtpj5_lateral1 -0.4, ff_offset]
-        mtpj5_lateral2 = proj_point_x(ff_center, mtpj5_adj, mtpj5_adj[0] + 4)
-        mtpj5_lateral2 = [mtpj5_adj[0] + 4, mtpj5_lateral2, ff_offset]
-        arch_mid = [(arch_medial[0] + arch_lateral[0]) / 2,
-                    (arch_medial[1] + arch_lateral[1]) / 2, 5.0]
-                    
                
         # =========================================================================
         
@@ -304,51 +288,25 @@ class FOBuild:
         self.makePoint('mid center curve point', point1)
         self.makePoint('mid cross curve heel point', point2)
                
-        ## MEDIAL CURVE
-        #medial_curve = Part.BSplineCurve()
-        #medial_curve_points = [heel_center, heel_center_medial,
-                                          # heel_medial, arch_medial_adj, 
-                                          # mtpj1_prox2, mtpj1_prox1, mtpj1_lateral1,
-                                          # mtpj1_lateral2,
-                                          # ff_center]
-        #medial_curve.buildFromPoles(medial_curve_points, False)
-        #medialCurve = self.doc.addObject("Part::Feature", "Medial Curve")                                  
-        #medialCurve.Shape = medial_curve.toShape()                                          
+        ## MEDIAL CURVE                                     
         medial_curve_points_vectors = [FreeCAD.Vector(heel_center), FreeCAD.Vector(heel_center_medial),
                                           FreeCAD.Vector(heel_medial), FreeCAD.Vector(arch_medial_adj), 
                                           FreeCAD.Vector(mtpj1_prox2), FreeCAD.Vector(mtpj1_prox1), FreeCAD.Vector(mtpj1_lateral1),
                                           FreeCAD.Vector(mtpj1_lateral2),
                                           FreeCAD.Vector(ff_center)]
-        medial_curve = Draft.make_bspline(medial_curve_points_vectors, closed=False, face=False, support=None)
-        medial_curve.ViewObject.LineColor = (0.0,0.5,0.5)
+        #medial_curve = Draft.make_bspline(medial_curve_points_vectors, closed=False, face=False, support=None)
+        #medial_curve.ViewObject.LineColor = (0.0,0.5,0.5)
         
-        ## LATERAL CURVE
-        #lateral_curve = Part.BSplineCurve()   
-        # lateral_curve_points = [heel_center, heel_center_lateral,
-                                           # heel_lateral, arch_lateral_adj, 
-                                           # mtpj5_prox2, mtpj5_prox1, mtpj5_lateral1,
-                                           # mtpj5_lateral2,
-                                           # ff_center]     
-        #lateral_curve.buildFromPoles(lateral_curve_points, False)
-        #lateralCurve = self.doc.addObject("Part::Feature", "Lateral Curve")                                  
-        #lateralCurve.Shape = lateral_curve.toShape()                                    
+        ## LATERAL CURVE                                 
         lateral_curve_points = [FreeCAD.Vector(heel_center), FreeCAD.Vector(heel_center_lateral),
                                            FreeCAD.Vector(heel_lateral), FreeCAD.Vector(arch_lateral_adj), 
                                            FreeCAD.Vector(mtpj5_prox2), FreeCAD.Vector(mtpj5_prox1), FreeCAD.Vector(mtpj5_lateral1),
                                            FreeCAD.Vector(mtpj5_lateral2),
                                            FreeCAD.Vector(ff_center)]
-        lateral_curve = Draft.make_bspline(lateral_curve_points, closed=False, face=False, support=None)
-        lateral_curve.ViewObject.LineColor = (0.0,0.5,0.5)         
+        #lateral_curve = Draft.make_bspline(lateral_curve_points, closed=False, face=False, support=None)
+        #lateral_curve.ViewObject.LineColor = (0.0,0.5,0.5)         
                  
         ## CENTER CURVE                                   
-        #center_curve = Part.BSplineCurve()   
-        # center_curve_points = [heel_center, 
-                                          # [(heel_medial[0] + heel_lateral[0]) / 2, 
-                                          # (heel_medial[1] + heel_lateral[1]) / 2, 0.0],
-                                          # arch_mid, ff_center]     
-        #center_curve.buildFromPoles(center_curve_points, False)
-        #centerCurve = self.doc.addObject("Part::Feature", "Center Curve")                                  
-        #centerCurve.Shape = center_curve.toShape()  
         center_curve_points = [FreeCAD.Vector(heel_center), 
                                           FreeCAD.Vector([(heel_medial[0] + heel_lateral[0]) / 2, 
                                           (heel_medial[1] + heel_lateral[1]) / 2, 0.0]),
@@ -357,14 +315,6 @@ class FOBuild:
         center_curve.ViewObject.LineColor = (0.0,0.5,0.5)
         
         ## CROSS CURVE HEEL        
-        #cross_curve_heel = Part.BSplineCurve()
-        # cross_curve_heel_points = [heel_medial, 
-                                              # [(heel_medial[0] + heel_lateral[0]) / 2, 
-                                               # (heel_medial[1] + heel_lateral[1]) / 2, 2.0], 
-                                              # heel_lateral]
-        #cross_curve_heel.buildFromPoles(cross_curve_heel_points, False)                                      
-        #crossCurveHeel = self.doc.addObject("Part::Feature", "Cross Curve Heel")                                  
-        #crossCurveHeel.Shape = cross_curve_heel.toShape() 
         cross_curve_heel_points = [FreeCAD.Vector(heel_medial), 
                                               FreeCAD.Vector([(heel_medial[0] + heel_lateral[0]) / 2, 
                                                (heel_medial[1] + heel_lateral[1]) / 2, 2.0]), 
@@ -373,18 +323,22 @@ class FOBuild:
         cross_curve_heel = Draft.make_bspline(cross_curve_heel_points, closed=False, face=False, support=None)
         cross_curve_heel.ViewObject.LineColor = (0.0,0.5,0.5)
         
-        ## CROSS CURVE ARCH
-        #cross_curve_arch = Part.BSplineCurve()
-        # cross_curve_arch_points = [arch_medial_adj, arch_mid, 
-                                              # arch_lateral_adj]
-        #cross_curve_arch.buildFromPoles(cross_curve_arch_points, False)   
-        #crossCurveArch = self.doc.addObject("Part::Feature", "Cross Curve Arch")                                  
-        #crossCurveArch.Shape = cross_curve_arch.toShape()                                      
+        ## CROSS CURVE ARCH                                
         cross_curve_arch_points = [FreeCAD.Vector(arch_medial_adj), FreeCAD.Vector(arch_mid), 
                                               FreeCAD.Vector(arch_lateral_adj)]
         cross_curve_arch = Draft.make_bspline(cross_curve_arch_points, closed=False, face=False, support=None)
         cross_curve_arch.ViewObject.LineColor = (0.0,0.5,0.5) 
-                                          
+                  
+        ## TOTAL OUTSIDE CURVE          
+        total_curve_points = [FreeCAD.Vector(heel_center), FreeCAD.Vector(heel_center_medial),
+                                          FreeCAD.Vector(heel_medial), FreeCAD.Vector(arch_medial_adj), 
+                                          FreeCAD.Vector(mtpj1_prox2), FreeCAD.Vector(mtpj1_prox1), FreeCAD.Vector(mtpj1_lateral1),
+                                          FreeCAD.Vector(mtpj1_lateral2),
+                                          FreeCAD.Vector(ff_center), FreeCAD.Vector(mtpj5_lateral2),FreeCAD.Vector(mtpj5_lateral1),FreeCAD.Vector(mtpj5_prox1),FreeCAD.Vector(mtpj5_prox2),FreeCAD.Vector(arch_lateral_adj), FreeCAD.Vector(heel_lateral),
+                                          FreeCAD.Vector(heel_center_lateral)]
+        total_curve = Draft.make_bspline(total_curve_points, closed=True, face=False, support=None)
+        total_curve.ViewObject.LineColor = (0.2,0.8,0.5)
+        
         
         self.doc.recompute()
         

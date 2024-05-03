@@ -8,7 +8,6 @@
 
 import FreeCAD, FreeCADGui
 import Draft
-import json
 import Part, PartGui
 import os
 import math
@@ -63,45 +62,47 @@ ff_med_y = [80, 80, 80, 80, 80, 80, 80, 80]
 ff_lat_x = [-40, -44.5, -40, -47.6, -37, -43, -38, -46]
 ff_lat_y = [60, 60, 60, 60, 60, 60, 80, 80]
 
-shoeCord = [[-126, -132, -126, -134, -115, -122, -136, -142], 
-            [-24, -30, -22.5, -28.9, -22, -27, -25, -31], 
-            [-100, -100, -100, -102, -95, -100, -103, -103],
-            [29, 36, 24.9, 33.1, 26.0, 33, 31, 34],
-            [-100, -100, -100, -100, -100, -100, -100, -100],
-            [18, 20, 16.8, 20.5, 17, 24, 17, 28],
-            [-121, -128, -120, -127, -110, -115, -130, -125],
-            [-15, -17.5, -13.9, -17.8, -19, -22, -14, -15],
-            [-121, -124.5, -119, -125.4, -105, -110, -131, -138],
-            [25, 36, 17.2, 37.4, 21, 38, 13, 38],
-            [-10, -12.7, -10, -13.3, -10, -10, -16, -16],
-            [-31, -34, -27.7, -36.4, -26, -35, -28, -38],
-            [-40, -40, -40, -41, -40, -40, -40, -40],
-            [32, 41, 25.6, 43.4, 25, 44, 29, 47],
-            [25, 25, 25, 23.4, 25, 25, 30, 30],
-            [37, 44, 35, 46.6, 30, 46, 41, 50],
-            [40, 40, 40, 38.1, 40, 40, 50, 50],
-            [39, 45.5, 38.6, 47.3, 33, 47, 43.5, 51],
-            [46, 46, 46.4, 42, 46, 46, 56, 56],
-            [40, 46, 40.6, 48.4, 36, 47, 45, 51],
-            [50, 50, 50, 50, 50, 50, 60, 60],
-            [46, 51, 44.5, 49.4, 40, 45, 47, 51],
-            [80, 80, 80, 80, 80, 80, 80, 80],
-            [32, 35, 31, 34.2, 30, 35, 35, 40],
-            [135, 136.7, 134.2, 135.9, 124, 124, 140, 145],
-            [12, 13, 11.4, 12.2, 12, 11, 7, 10],
-            [145, 146, 143.9, 147.8, 134, 140, 154, 160],
-            [-13, -15.4, -12.3, -15.4, -11, -19, -9, -18],
-            [136, 137.7, 135.3, 137.7, 124, 124, 150, 150],
-            [-40, -44.5, -40, -47.6, -37, -43, -38, -46],
-            [60, 60, 60, 60, 60, 60, 80, 80],
-            [-38, -41, -36.9, -45, -35, -41, -39, -46],
-            [17, 17, 17, 17, 17, 17, 20, 20],
-            [-38.5, -42, -37.5, -46, -36, -42, -39, -46],
-            [22, 22, 22, 22, 22, 22, 22, 22],
-            [-39, -42.5, -38.6, -47, -37, -42, -39, -47],
-            [27, 27, 27, 26, 27, 27, 30, 30],
-            [-37, -40, -34.5, -43.4, -34, -41, -37, -45],
-            [9, 9, 9, 6.4, 9, 9, 10, 10]]
+shoeCord_female = [[-126, -132, -126, -134, -115, -122, -136, -142], 
+                    [-24, -30, -22.5, -28.9, -22, -27, -25, -31], 
+                    [-100, -100, -100, -102, -95, -100, -103, -103],
+                    [29, 36, 24.9, 33.1, 26.0, 33, 31, 34],
+                    [-100, -100, -100, -100, -100, -100, -100, -100],
+                    [18, 20, 16.8, 20.5, 17, 24, 17, 28],
+                    [-121, -128, -120, -127, -110, -115, -130, -125],
+                    [-15, -17.5, -13.9, -17.8, -19, -22, -14, -15],
+                    [-121, -124.5, -119, -125.4, -105, -110, -131, -138],
+                    [25, 36, 17.2, 37.4, 21, 38, 13, 38],
+                    [-10, -12.7, -10, -13.3, -10, -10, -16, -16],
+                    [-31, -34, -27.7, -36.4, -26, -35, -28, -38],
+                    [-40, -40, -40, -41, -40, -40, -40, -40],
+                    [32, 41, 25.6, 43.4, 25, 44, 29, 47],
+                    [25, 25, 25, 23.4, 25, 25, 30, 30],
+                    [37, 44, 35, 46.6, 30, 46, 41, 50],
+                    [40, 40, 40, 38.1, 40, 40, 50, 50],
+                    [39, 45.5, 38.6, 47.3, 33, 47, 43.5, 51],
+                    [46, 46, 46.4, 42, 46, 46, 56, 56],
+                    [40, 46, 40.6, 48.4, 36, 47, 45, 51],
+                    [50, 50, 50, 50, 50, 50, 60, 60],
+                    [46, 51, 44.5, 49.4, 40, 45, 47, 51],
+                    [80, 80, 80, 80, 80, 80, 80, 80],
+                    [32, 35, 31, 34.2, 30, 35, 35, 40],
+                    [135, 136.7, 134.2, 135.9, 124, 124, 140, 145],
+                    [12, 13, 11.4, 12.2, 12, 11, 7, 10],
+                    [145, 146, 143.9, 147.8, 134, 140, 154, 160],
+                    [-13, -15.4, -12.3, -15.4, -11, -19, -9, -18],
+                    [136, 137.7, 135.3, 137.7, 124, 124, 150, 150],
+                    [-40, -44.5, -40, -47.6, -37, -43, -38, -46],
+                    [60, 60, 60, 60, 60, 60, 80, 80],
+                    [-38, -41, -36.9, -45, -35, -41, -39, -46],
+                    [17, 17, 17, 17, 17, 17, 20, 20],
+                    [-38.5, -42, -37.5, -46, -36, -42, -39, -46],
+                    [22, 22, 22, 22, 22, 22, 22, 22],
+                    [-39, -42.5, -38.6, -47, -37, -42, -39, -47],
+                    [27, 27, 27, 26, 27, 27, 30, 30],
+                    [-37, -40, -34.5, -43.4, -34, -41, -37, -45],
+                    [9, 9, 9, 6.4, 9, 9, 10, 10]]
+                    
+shoeCord_male = [0]
 
 class FOPosition:
 
@@ -129,11 +130,16 @@ class FOPosition:
                           "MTH5_on_the_plantar_surface",
                           "point_on_arch"]
         self.next_position = 0
-        print("Identify lowest point of heel on the plantar surface")
+        
         self.view = FreeCADGui.activeView()
         self.active_position = "lowest point of heel on the plantar surface"
         self.doc = FreeCAD.activeDocument()
-        self.clickCallback = self.view.addEventCallback("SoMouseButtonEvent",self.logPosition)
+        if self.doc.getObjectsByLabel("Shoe_Edge") == []:
+            print("Identify lowest point of heel on the plantar surface")
+            self.clickCallback = self.view.addEventCallback("SoMouseButtonEvent",self.logPosition)
+        else:    
+            FreeCADGui.Control.showDialog(self.task)
+            
 
 
     def logPosition(self, info):
@@ -204,19 +210,8 @@ class FOPosition:
         # filepath = os.path.expanduser("~/Documents/shoeOutline.txt")
         # f = open(filepath, "r")
         # shoeCord = f.read()
-    
-    def readJson(self):
-        filepath = os.path.expanduser("~/Documents/importVariables.json")
-        f = open(filepath, "r") 
-        self.parameters = json.loads(f.read())
-        shoe_size = float(self.parameters['shoe_size'])
-        return shoe_size
-
-
-    def buildShoeShape(self, size):        
-        minSize = 3
-        size_index = int((size - minSize) * 2)
-
+   
+    def buildShoeShape(self, size_index):        
         # make shoe outline numbers into coordinates
         
         # heel_center = [0, heel_center_pt_y[size_index], 0]
@@ -227,6 +222,7 @@ class FOPosition:
         # arch_medial = [arch_medial_pt_x[size_index], arch_medial_pt_y[size_index], 0]
         # arch_lateral = [arch_lateral_pt_x[size_index], arch_lateral_pt_y[size_index], 0]
         # mtpj1_prox = [mtpj1_prox_x[size_index], mtpj1_prox_y[size_index], 0]
+        # mtpj1 = [mtpj1_pt_x[size_index], mtpj1_pt_y[size_index], 0]
         # mtpj1 = [mtpj1_pt_x[size_index], mtpj1_pt_y[size_index], 0]
         # mtpj1_dist1 = [mtpj1_dist1_x[size_index], mtpj1_dist1_y[size_index], 0]
         # mtpj1_dist2 = [mtpj1_dist2_x[size_index], mtpj1_dist2_y[size_index], 0]
@@ -244,8 +240,11 @@ class FOPosition:
         #ShoeCords order: heel_center_pt_y ,heel_lateral_pt_x ,heel_lateral_pt_y ,heel_medial_pt_x,heel_medial_pt_y ,heel_center_medial_x,heel_center_medial_y,heel_center_lateral_x ,heel_center_lateral_y,arch_medial_pt_x,arch_medial_pt_y,arch_lateral_pt_x,
             #arch_lateral_pt_y,mtpj1_prox_x,mtpj1_prox_y,mtpj1_pt_x,mtpj1_pt_y,mtpj1_dist1_x,mtpj1_dist1_y ,mtpj1_dist2_x,mtpj1_dist2_y,ff_med_x,ff_med_y,toe_med_x,toe_med_y ,toe_pt_x,toe_pt_y,toe_lat_x,toe_lat_y,ff_lat_x,ff_lat_y,mtpj5_pt_x,
             #mtpj5_pt_y,mtpj5_dist1_x ,mtpj5_dist1_y,mtpj5_dist2_x,mtpj5_dist2_y,mtpj5_prox_x,mtpj5_prox_y
-
-
+        shoe_sex = int(self.doc.getObjectsByLabel("shoe_sex")[0].X) # Female = 1, Male = -1
+        if shoe_sex == 1:
+            shoeCord = shoeCord_female
+        else:
+            shoeCord = shoeCord_male
         heel_center = [0, shoeCord[0][size_index], 0]
         heel_lateral = [shoeCord[1][size_index], shoeCord[2][size_index], 0]
         heel_medial = [shoeCord[3][size_index], shoeCord[4][size_index], 0]
@@ -294,8 +293,21 @@ class FOPosition:
             for i in range(len(points_outline)):
                 points_outline[i]=[-points_outline[i][0], points_outline[i][1], points_outline[i][2]]
             self.side = "Right"
+            point = self.doc.addObject("Part::Vertex", "side")
+            point.X = 1
+            point.Y = 0
+            point.Z = 0
+            point.Label = "side"
+            point.ViewObject.hide()
         else:
             self.side = "Left"
+            point = self.doc.addObject("Part::Vertex", "side")
+            point.X = -1
+            point.Y = 0
+            point.Z = 0
+            point.Label = "side"
+            point.ViewObject.hide()
+            
             
         self.bs_Outline = Part.BSplineCurve()
         self.bs_Outline.buildFromPoles(points_outline, True)
@@ -309,7 +321,8 @@ class FOPosition:
 
             
     def moveMesh(self):
-        self.buildShoeShape(self.readJson())
+        shoe_size = int(self.doc.getObjectsByLabel("shoe_size")[0].X)
+        self.buildShoeShape(shoe_size)
         mesh_foot = self.doc.getObjectsByLabel("Mesh")[0]
 
         heel_pt_x = self.heel_pt.X - self.midpoint.X
@@ -354,20 +367,21 @@ class FOPosition:
      
         
         #New placement of the foot with translation and rotation to match shoe outline
-        mesh_foot.Placement = FreeCAD.Placement(FreeCAD.Vector(self.midpoint.X,self.midpoint.Z,self.midpoint.Y), FreeCAD.Rotation(FreeCAD.Vector(-rot_axis[0], -rot_axis[1], rot_axis[2]),theta),FreeCAD.Vector(0,0,0))
-        mesh_final = mesh_foot.Mesh.copy()
-        Mesh.show(mesh_final)
+        mesh_foot.Placement = FreeCAD.Placement(FreeCAD.Vector(self.midpoint.X,self.midpoint.Z,self.midpoint.Y), 
+                                                FreeCAD.Rotation(FreeCAD.Vector(-rot_axis[0], -rot_axis[1], rot_axis[2]),theta),
+                                                FreeCAD.Vector(0,0,0))
+        self.mesh_final = mesh_foot.Mesh.copy()
+        Mesh.show(self.mesh_final)
         self.doc.recompute()
         
     def remove_objects(self):
         #Removes points made to rotate mesh
         for obj in self.doc.Objects:
-            if obj.Label not in ["Shoe_Edge", "Mesh001"]:
+            if obj.Label not in ["Shoe_Edge", "Mesh001", "posting", "shoe_size", "shoe_sex", "FO_thickness", "heel_raise", "side"]:
                 try:
                     self.doc.removeObject(obj.Label.replace(' ', '_'))
                 except Exception as e:
                     print(f"Could not remove {obj.Label.replace(' ', '_')} exception {e}")
-        mesh_foot = self.doc.getObjectsByLabel("Mesh001")[0]
         self.doc.recompute()
 
     def finish(self):

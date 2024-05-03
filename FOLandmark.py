@@ -11,7 +11,6 @@ import FreeCAD
 import FreeCADGui
 import Part, PartGui
 import math
-import json
 import os
 
 from task_landmark import LandmarkTaskPanel
@@ -103,10 +102,6 @@ class FOLandmark:
                 point.ViewObject.PointSize = 5
                 point.ViewObject.PointColor = (0.3, 0.1, 0.8)
                 self.doc.recompute()
-                #dump landmarks to json file (may not be neccessary)
-                filepath = os.path.expanduser("~/Documents/landmarkVariables.json")
-                with open(filepath, "w+") as write_file:
-                    json.dump(self.positions, write_file)
                 self.finish()
                 FreeCADGui.Control.showDialog(self.task)
 
